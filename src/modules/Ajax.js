@@ -11,13 +11,12 @@ const Ajax = {};
  * @param object errorCb
  * @param mixed data
  */
-Ajax.send = (url, successCb, errorCb, data) => {
+Ajax.send = (method, url, successCb, errorCb, data) => {
 	try {
 		let req = Ajax.getXmlRequest(Ajax.getWindow());
-		let method = data ? 'POST' : 'GET';
 		req.open(method, url, 1);
 		if (method === 'POST') {
-			req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			req.setRequestHeader('Content-type', 'application/json');
 		}
 		req.onreadystatechange = (e) => {
 			Ajax.handleReadyStateChange(e.target, successCb, errorCb);
@@ -38,8 +37,27 @@ Ajax.send = (url, successCb, errorCb, data) => {
 
 
 Ajax.sendWithPromise = (url, data) => {
+	let method = data ? 'POST' : 'GET';
 	return new Promise((resolve, reject) => {
-		Ajax.send(url, resolve, reject, data);
+		Ajax.send(method, url, resolve, reject, data);
+	});
+}
+
+Ajax.getWithPromise = (url) => {
+	return new Promise((resolve, reject) => {
+		Ajax.send('GET', url, resolve, reject);
+	});
+}
+
+Ajax.postWithPromise = (url, data) => {
+	return new Promise((resolve, reject) => {
+		Ajax.send('POST', url, resolve, reject, data);
+	});
+}
+
+Ajax.deleteWithPromise = (url) => {
+	return new Promise((resolve, reject) => {
+		Ajax.send('DELETE', url, resolve, reject);
 	});
 }
 

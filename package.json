@@ -5,7 +5,8 @@
   "dependencies": {
     "parent-module": "^0.1.0",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "styled-components": "^2.1.0"
   },
   "devDependencies": {
     "autoprefixer": "7.1.0",

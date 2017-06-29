@@ -1,22 +1,23 @@
 const	Config = {
 
-	init: function({ schemaName, displayField }) {
-		let t = this;
-
-		if (!schemaName || !displayField) {
+	init: function(xrm, { schemaName, displayField }) {
+		if (!xrm || !schemaName || !displayField) {
 			throw new Error(`init() must have schemaName and displayField.`);
 		}
-		t.api = 'https://portmgt-test.crm.dynamics.com/api/data/v8.2';
+
+		let t = this;
+		let clientUrl = xrm.Page.context.getClientUrl();
+
+		t.api = `${clientUrl}/api/data/v8.2`;
 		t.schemaName = schemaName;
 		t.displayField = displayField;
 		t.relationshipType = undefined;
+		t.thisEntId = undefined;
 		t.thisEntName = undefined;
-		t.thisEntPrimaryIdAttr = undefined;
 		t.thisEntIntersectAttr = undefined;
 		t.relatedEntName = undefined;
 		t.relatedEntCollName = undefined;
 		t.relatedEntPrimaryIdAttr = undefined;
-		t.relatedEntIntersectAttr = undefined;
 		t.records = [];
 	},
 
@@ -27,6 +28,7 @@ const	Config = {
 		if (t.thisEntName && !t.thisEntName.trim()) {
 			throw new Error('thisEntName must be set before calling configure().');
 		}
+
 		if (m.RelationshipType.toLowerCase() !== 'manytomanyrelationship') {
 			throw new Error(`${t.schemaName} is not N:N.`);
 		}
