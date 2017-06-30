@@ -2,7 +2,7 @@ const	Config = {
 
 	init: function(xrm, { schemaName, displayField }) {
 		if (!xrm || !schemaName || !displayField) {
-			throw new Error(`init() must have schemaName and displayField.`);
+			throw new Error(`Config must be initialized with Xrm object, schemaName, and displayField.`);
 		}
 
 		let t = this;

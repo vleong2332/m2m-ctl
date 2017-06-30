@@ -45,8 +45,7 @@ export function getCurrentlyAssociated(api, collectionName, id, schemaName, sele
 	return Ajax.getWithPromise(`${api}/${collectionName}(${id})/${schemaName}?` +
 		`$select=${select.join(',')}`
 	)
-		.then(resp => resp && JSON.parse(resp).value)
-		.catch(console.error);
+		.then(resp => resp && JSON.parse(resp).value);
 }
 
 

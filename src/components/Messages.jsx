@@ -1,12 +1,18 @@
 import React from 'react';
+import styled from 'styled-components';
 
 import Message from './Message';
 
+const StyledMessages = styled.div`
+	flex: 1 1 auto;
+	padding: 0.25rem;
+`;
+
 const Messages = ({ messages }) => {
 	return (
-		<div className="messages">
-			{messages.map((message, index) => <Message key={index} content={message} />)}
-		</div>
+		<StyledMessages className="messages">
+			{messages.map((message, index) => <Message key={index} message={message} />)}
+		</StyledMessages>
 	);
 };
 
