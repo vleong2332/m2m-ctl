@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "lodash.groupby": "^4.6.0",
+    "lodash.isequal": "^4.5.0",
     "parent-module": "^0.1.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",

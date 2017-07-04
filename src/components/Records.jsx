@@ -4,36 +4,39 @@ import styled from 'styled-components';
 import Record from './Record';
 
 const StyledRecords = styled.div`
-	flex: 1 1 auto;
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	overflow: auto;
+	height: ${({ collapsed }) => collapsed ? '0px' : '100%'};
+	overflow: hidden;
 `;
 
 const renderRecords = props => {
-	let { list, logicalName, primaryAttr, displayField, status, associated, associate,
-		disassociate } = props;
+	let { config, list, status, associated, associate, disassociate } = props;
+
 	return list && list.map((item, index) => {
-		let id = item[primaryAttr];
+		let id = item[config.relatedEntPrimaryIdAttr];
+		let content = item[config.displayField];
+		let isAssociated = associated.indexOf(id) !== -1;
+
 		return (
 			<Record
 				key={index}
-				content={item[displayField]}
-				logicalName={logicalName}
+				content={content}
+				logicalName={config.logicalName}
 				entityId={id}
 				status={status}
 				associate={associate}
 				disassociate={disassociate}
-				associated={associated.indexOf(id) !== -1}
+				associated={isAssociated}
 			/>
 		);
-	})
+	});
 };
 
 const Records = props => {
 	return (
-		<StyledRecords className="records">
+		<StyledRecords className="records" collapsed={props.collapsed}>
 			{renderRecords(props)}
 		</StyledRecords>
 	);

@@ -1,6 +1,6 @@
 const	Config = {
 
-	init: function(xrm, { schemaName, displayField }) {
+	init: function(xrm, { schemaName, displayField, groupByField }) {
 		if (!xrm || !schemaName || !displayField) {
 			throw new Error(`Config must be initialized with Xrm object, schemaName, and displayField.`);
 		}
@@ -11,6 +11,7 @@ const	Config = {
 		t.api = `${clientUrl}/api/data/v8.2`;
 		t.schemaName = schemaName;
 		t.displayField = displayField;
+		t.groupByField = groupByField;
 		t.relationshipType = undefined;
 		t.thisEntId = undefined;
 		t.thisEntName = undefined;
