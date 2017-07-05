@@ -11,13 +11,6 @@ const StyledRecords = styled.div`
 	overflow: hidden;
 `;
 
-const PhantomRecord = styled.div`
-	visibility: hidden;
-	pointer-events: none;
-	flex: 1 1 5rem;
-	padding: 0 0.25rem;
-`;
-
 const renderRecords = props => {
 	let { config, list, status, associated, associate, disassociate } = props;
 
@@ -50,7 +43,7 @@ const renderPhantomRecords = props => {
 	if (itemsWidth > rowWidth) {
 		let phantomRecords = [];
 		for (let i = 0; i < 12; i++) {
-			phantomRecords.push(<PhantomRecord />);
+			phantomRecords.push(<Record phantom />);
 		}
 		return phantomRecords;
 	}
