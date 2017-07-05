@@ -11,6 +11,13 @@ const StyledRecords = styled.div`
 	overflow: hidden;
 `;
 
+const PhantomRecord = styled.div`
+	visibility: hidden;
+	pointer-events: none;
+	flex: 1 1 5rem;
+	padding: 0 0.25rem;
+`;
+
 const renderRecords = props => {
 	let { config, list, status, associated, associate, disassociate } = props;
 
@@ -34,10 +41,26 @@ const renderRecords = props => {
 	});
 };
 
+const renderPhantomRecords = props => {
+	let { list } = props;
+	// Assuming that this record container spans the full width of the body.
+	let rowWidth = window.document.body.clientWidth;
+	let recordFlexBasis = 90;
+	let itemsWidth = list.length * recordFlexBasis;
+	if (itemsWidth > rowWidth) {
+		let phantomRecords = [];
+		for (let i = 0; i < 12; i++) {
+			phantomRecords.push(<PhantomRecord />);
+		}
+		return phantomRecords;
+	}
+};
+
 const Records = props => {
 	return (
 		<StyledRecords className="records" collapsed={props.collapsed}>
 			{renderRecords(props)}
+			{renderPhantomRecords(props)}
 		</StyledRecords>
 	);
 };
