@@ -16,19 +16,16 @@ export function getParam(encodedUrl, paramName) {
 }
 
 export function getRelationshipMetadata(api, schemaName) {
-	return Ajax.getWithPromise(`${api}/RelationshipDefinitions?` +
-		`$filter=SchemaName eq '${schemaName}'`
-	)
-		.then(resp => resp && JSON.parse(resp).value[0])
+	return Ajax.getWithPromise(`${api}/RelationshipDefinitions(SchemaName='${schemaName}')`)
+		.then(resp => resp && JSON.parse(resp))
 		.catch(console.error);
 }
 
 export function getEntityMetadata(api, entityName, select) {
-	return Ajax.getWithPromise(`${api}/EntityDefinitions?` +
-		`$select=${select.join(',')}&` +
-		`$filter=LogicalName eq '${entityName}'`
+	return Ajax.getWithPromise(`${api}/EntityDefinitions(LogicalName='${entityName}')?` +
+		`$select=${select.join(',')}`
 	)
-		.then(resp => resp && JSON.parse(resp).value[0])
+		.then(resp => resp && JSON.parse(resp))
 		.catch(console.error);
 }
 

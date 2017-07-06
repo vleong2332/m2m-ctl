@@ -29,7 +29,6 @@ const getStatus = ({ errors, queue }) => {
 };
 
 const Notification = props => {
-	console.log('NOTIFICATION', props.queue);
 	return (
 		<StyledNotification className="notification">
 			<Message message={getMessage(props)} />
