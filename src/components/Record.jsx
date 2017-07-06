@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const StyledRecord = styled.div`
 	flex: 1 1 5rem;
 	padding: 0.25rem;
-	cursor: pointer;
+	cursor: ${({ready}) => ready ? 'pointer' : 'inherit'};
 	background-color: ${({ associated }) => associated ? 'steelblue' : 'initial'};
 	color: ${({ associated }) => associated ? 'white' : 'initial'};
 	font-weight: ${({ associated }) => associated ? 'bold' : 'normal'};
@@ -19,22 +19,19 @@ const PhantomRecord = styled.div`
 `;
 
 const Record = props => {
-	let { phantom, content, logicalName, entityId, status, associated, associate,
+	let { phantom, content, logicalName, entityId, ready, associated, associate,
 		disassociate } = props;
+
 	return phantom ?
 		<PhantomRecord /> :
 		(
 			<StyledRecord
 				className='record'
-				status={status}
+				ready={ready}
 				associated={associated}
 				logicalName={logicalName}
 				entityId={entityId}
-				onClick={() => {
-					if (status !== 'busy') {
-						return associated ? disassociate(entityId) : associate(entityId);
-					}
-				}}
+				onClick={() => associated ? disassociate(entityId) : associate(entityId)}
 			>
 				{content}
 			</StyledRecord>

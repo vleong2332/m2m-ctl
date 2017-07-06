@@ -26,6 +26,7 @@ const StyledApp = styled.div`
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+	pointer-events: ${({ready}) => ready ? 'auto' : 'none'};
 `;
 
 const ContentPanel = styled.div`
@@ -42,64 +43,79 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			status: 'busy', /* ok, busy, warning, error */
-			message: 'Loading',
+			errors: [],
+			queue: [],
 			records: [],
 			associated: []
 		};
-		this.setMessage = this.setMessage.bind(this);
+		this.addError = this.addError.bind(this);
+		this.addQueue = this.addQueue.bind(this);
+		this.removeQueue = this.removeQueue.bind(this);
 		this.associate = this.associate.bind(this);
 		this.disassociate = this.disassociate.bind(this);
+		this.getData = this.getData.bind(this);
+		this.getId = this.getId.bind(this);
+		this.getGroupedRecords = this.getGroupedRecords.bind(this);
+		this.isReady= this.isReady.bind(this);
 	}
 
 	/**
 	 * "Actions" and "Reducers"
 	 */
 
-	setStatus(status, cb) {
-		this.setState({ status }, cb);
+	addError(message, cb) {
+		let errors = this.state.errors.slice(0,);
+		errors.push(message);
+		this.setState({ errors }, cb);
 	}
 
-	setMessage(message, cb) {
-		this.setState({ message }, cb);
+	addQueue(message, cb) {
+		let key = Date.now();
+		let queue = this.state.queue.slice(0,);
+		queue.push({ key, message });
+		this.setState({ queue }, cb);
+		return key;
+	}
+
+	removeQueue(key, cb) {
+		let queue = this.state.queue.slice(0,);
+		let cleanedQueue = queue.filter(el => el.key !== key);
+		this.setState({ queue: cleanedQueue }, cb);
 	}
 
 	associate(recordId, cb) {
-		this.setMessage('Associating...')
-		this.setStatus('busy', () => {
-			associateInPort(recordId, Config)
-				.then(resp => {
-					let associated = this.state.associated.slice(0,);
-					associated.push(recordId);
-					this.setState({ associated }, cb);
-					this.setStatus('ok');
-					this.setMessage('Ready');
-				})
-				.catch(err => {
-					console.error(err);
-					this.setStatus('error');
-					this.setMessage('Associate failed');
+		let queueKey = this.addQueue('Associating...');
+
+		associateInPort(recordId, Config)
+			.then(resp => {
+				let associated = this.state.associated.slice(0,);
+				associated.push(recordId);
+				this.setState({ associated }, () => {
+					this.removeQueue(queueKey);
+					cb && cb();
 				});
-		});
+			})
+			.catch(err => {
+				console.error(err);
+				this.addError('Associate failed');
+			});
 
 	}
 
 	disassociate(recordId, cb) {
-		this.setMessage('Disassociating...');
-		this.setStatus('busy', () => {
-			disassociateInPort(recordId, Config)
-				.then(resp => {
-					let associated = this.state.associated.filter(id => id !== recordId);
-					this.setState({ associated }, cb);
-					this.setStatus('ok');
-					this.setMessage('Ready');
-				})
-				.catch(err => {
-					console.error(err);
-					this.setStatus('error');
-					this.setMessage('Disassociate failed');
+		let queueKey = this.addQueue('Disassociating...');
+
+		disassociateInPort(recordId, Config)
+			.then(resp => {
+				let associated = this.state.associated.filter(id => id !== recordId);
+				this.setState({ associated }, () => {
+					this.removeQueue(queueKey);
 				});
-		});
+			})
+			.catch(err => {
+				console.error(err);
+				this.addError('Disassociate failed');
+			});
 	}
 
 	/**
@@ -107,127 +123,138 @@ class App extends Component {
 	 */
 
 	componentWillMount() {
-		let data = this.getData(window.location.search);
-		let thisEntName = getParam(window.location.search, 'typename');
-		let thisEntId = this.getId(window.location.search);
-
 		try {
+			let data = this.getData(window.location.search);
+			let thisEntName = getParam(window.location.search, 'typename');
+			let thisEntId = this.getId(window.location.search);
+
 			Config.init(this.props.xrm, data);
+			Config.thisEntName = thisEntName;
+			Config.thisEntId = thisEntId && thisEntId.replace(/{|}/g, '');
 		} catch (err) {
 			console.error(err);
-			return;
+			this.addError(err.message);
 		}
-
-		Config.thisEntName = thisEntName;
-		Config.thisEntId = thisEntId && thisEntId.replace(/{|}/g, '');
 	}
 
 	componentDidMount() {
-		let componentWillMountSucceeds = !!(
-			Config.api && Config.schemaName && Config.displayField && Config.thisEntName &&
-			Config.thisEntId
-		);
+		let c = Config;
 
-		if (!componentWillMountSucceeds) {
-			this.setStatus('error');
-			this.setMessage('Config is improperly configured.');
+		if (!c.initIsSuccessful) {
+			this.addError('Config is improperly configured.');
 			return;
 		}
 
-		let { api, schemaName, displayField } = Config;
+		let relationshipMetadataKey = this.addQueue('Getting relationship metadata');
+		let thisEntMetadataKey = this.addQueue('Getting this entity metadata');
+		let relatedEntMetadataKey = this.addQueue('Getting related entity metadata');
+		let relatedEntRecordsKey = this.addQueue('Getting related entity records');
+		let currentlyAssociatedRecordsKey = this.addQueue('Getting currently associated records');
 
-		getRelationshipMetadata(api, schemaName)
+		// Start the promise chain by getting info about the N:N relationship, ...
+		getRelationshipMetadata(c.api, c.schemaName)
 
+			// ... and store them in the config.
 			.then(metadata => {
+				this.removeQueue(relationshipMetadataKey);
+
 				if (!metadata) {
 					throw new Error('Cannot get relationship metadata');
 				}
 
-				Config.configure(metadata);
-
-				return getEntityMetadata(api, Config.thisEntName, [
-					'LogicalCollectionName'
-				]);
+				c.configure(metadata);
 			})
 
+			// Get info about this entity, ...
+			.then(() => {
+				let select = [
+					'LogicalCollectionName'
+				];
+
+				return getEntityMetadata(c.api, c.thisEntName, select);
+			})
+
+			// ... and store them in the config.
 			.then(metadata => {
+				this.removeQueue(thisEntMetadataKey);
+
 				if (!metadata) {
-					throw new Error('Cannot get entity metadata for ', Config.thisEntName);
+					throw new Error('Cannot get entity metadata for ', c.thisEntName);
 				}
 
-				Config.thisEntCollName = metadata.LogicalCollectionName;
+				c.thisEntCollName = metadata.LogicalCollectionName;
+			})
 
-				return getEntityMetadata(api, Config.relatedEntName, [
+			// Get info about the related entity, ...
+			.then(() => {
+				let select = [
 					'PrimaryIdAttribute',
 					'LogicalCollectionName'
-				]);
+				];
+
+				return getEntityMetadata(c.api, c.relatedEntName, select);
 			})
 
+			// ... and store them in the config.
 			.then(metadata => {
+				this.removeQueue(relatedEntMetadataKey);
+
 				if (!metadata) {
-					throw new Error('Cannot get entity metadata for ', Config.relatedEntName);
+					throw new Error('Cannot get entity metadata for ', c.relatedEntName);
 				}
 
-				Config.relatedEntPrimaryIdAttr = metadata.PrimaryIdAttribute;
-				Config.relatedEntCollName = metadata.LogicalCollectionName;
-
-				let cleanedSelect = [
-					Config.relatedEntPrimaryIdAttr,
-					displayField,
-					Config.groupByField || ''
-				].filter(entry => entry);
-
-				return getRelatedEntityRecords(api, Config.relatedEntCollName, cleanedSelect);
+				c.relatedEntPrimaryIdAttr = metadata.PrimaryIdAttribute;
+				c.relatedEntCollName = metadata.LogicalCollectionName;
 			})
 
+			// Get the related entity records, ...
+			.then(() => {
+
+				let select = [
+					c.relatedEntPrimaryIdAttr,
+					c.displayField,
+					c.groupByField || ''
+				].filter(entry => entry);
+
+				return getRelatedEntityRecords(c.api, c.relatedEntCollName, select);
+			})
+
+			// ... and store them in the state.
 			.then(records => {
+				this.removeQueue(relatedEntRecordsKey);
+
 				if (!records) {
 					throw new Error('Cannot get related entity records');
 				}
 
-				let cb = this.preselectRecords.bind(this);
+				let sortedGroupedRecords = this.getGroupedRecords(records, c.groupByField);
 
-				// Config.records = records;
-				if (Config.groupByField) {
-					let groupedRecords = groupBy(records, Config.groupByField);
-					let sortedKeys = Object.keys(groupedRecords).sort();
-					let sortedGroupedRecords = sortedKeys.map(key => ({
-						name: key,
-						list: groupedRecords[key]
-					}));
-					this.setState({ records: sortedGroupedRecords }, cb);
-				} else {
-					this.setState({ records }, cb);
-				}
+				this.setState({ records: sortedGroupedRecords || records });
 			})
 
-			.catch(err => {
-				this.setStatus('error');
-				this.setMessage('Initialization error');
-			});
-	}
+			// Get currently associated related records, ...
+			.then(() => {
+				return getCurrentlyAssociated(
+					c.api,
+					c.thisEntCollName,
+					c.thisEntId,
+					c.schemaName,
+					[c.relatedEntPrimaryIdAttr]
+				);
+			})
 
-	preselectRecords() {
-		console.log('PRESELECTRECORDS', this.state.records);
-		getCurrentlyAssociated(
-			Config.api,
-			Config.thisEntCollName,
-			Config.thisEntId,
-			Config.schemaName,
-			[Config.relatedEntPrimaryIdAttr]
-		)
+			// ... and store them in the state.
 			.then(records => {
+				this.removeQueue(currentlyAssociatedRecordsKey);
+
 				if (records) {
-					let ids = records.map(record => record[Config.relatedEntPrimaryIdAttr]);
+					let ids = records.map(record => record[c.relatedEntPrimaryIdAttr]);
 					this.setState({ associated: ids });
 				}
-				this.setStatus('ok');
-				this.setMessage('Ready');
 			})
+
 			.catch(err => {
-				console.error(err);
-				this.setStatus('error');
-				this.setMessage('Cannot get currently associated records');
+				this.addError(err.message);
 			});
 	}
 
@@ -240,8 +267,8 @@ class App extends Component {
 			// let data = getParam(url, 'data');
 			// return JSON.parse(decodeURIComponent(data));
 		} catch (err) {
-			this.setStatus('error');
-			this.setMessage('Error in parsing extra data. Is it passed in as an encoded string?')
+			console.error(err);
+			this.addError('Error in parsing extra data. Is it passed in as an encoded string?')
 		}
 		return {
 			schemaName: 'wa_wa_project_wa_book',
@@ -255,9 +282,29 @@ class App extends Component {
 			let data = getParam(url, 'id');
 			return decodeURIComponent(data).replace(/{|}/g, '');
 		} catch (err) {
-			this.setStatus('error');
-			this.setMessage('Error in parsing id. Is it passed in as query?')
+			console.error(err);
+			this.addError('Error in parsing id. Is it passed in as query?')
 		}
+	}
+
+	getGroupedRecords(records, groupByField) {
+		let result = undefined;
+		if (groupByField) {
+			let groupingKey = this.addQueue('Grouping records');
+			let groupedRecords = groupBy(records, groupByField);
+			let sortedKeys = Object.keys(groupedRecords).sort();
+
+			result = sortedKeys.map(key => ({
+				name: key,
+				list: groupedRecords[key]
+			}));
+			this.removeQueue(groupingKey);
+		}
+		return result;
+	}
+
+	isReady(errors, queue) {
+		return errors.length <= 0 && queue.length <= 0;
 	}
 
 	/**
@@ -265,32 +312,35 @@ class App extends Component {
 	 */
 
   render() {
+		let { records, errors, queue, associated } = this.state;
+		let ready = this.isReady(errors, queue);
+
     return (
-      <StyledApp className="app">
+      <StyledApp className="app" ready={ready}>
 				<ContentPanel className="content-panel">
 					{
 						Config.groupByField ?
 							<GroupedRecords
+								ready={ready}
 								config={Config}
-								list={this.state.records}
-								status={this.state.status}
-								associated={this.state.associated}
+								list={records}
+								associated={associated}
 								associate={this.associate}
 								disassociate={this.disassociate}
 							/> :
 							<Records
+								ready={ready}
 								config={Config}
-								list={this.state.records}
-								status={this.state.status}
-								associated={this.state.associated}
+								list={records}
+								associated={associated}
 								associate={this.associate}
 								disassociate={this.disassociate}
 							/>
 					}
 				</ContentPanel>
 				<Notification
-					status={this.state.status}
-					message={this.state.message} />
+					errors={this.state.errors}
+					queue={this.state.queue} />
       </StyledApp>
     );
   }

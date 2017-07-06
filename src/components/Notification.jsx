@@ -12,12 +12,28 @@ const StyledNotification = styled.div`
 	width: 100%;
 `;
 
+const getMessage = ({ errors, queue }) => {
+	return errors.length > 0 ?
+		errors[0] :
+		queue.length > 0 ?
+			queue[0].message :
+			'Ready';
+};
+
+const getStatus = ({ errors, queue }) => {
+	return errors.length > 0 ?
+		'error' :
+		queue.length > 0 ?
+			'busy' :
+			'ok';
+};
+
 const Notification = props => {
-	let { isAtTop, message, status } = props;
+	console.log('NOTIFICATION', props.queue);
 	return (
-		<StyledNotification className="notification" isAtTop={isAtTop}>
-			<Message message={message} />
-			<StatusIcon status={status} />
+		<StyledNotification className="notification">
+			<Message message={getMessage(props)} />
+			<StatusIcon status={getStatus(props)} />
 		</StyledNotification>
 	);
 };

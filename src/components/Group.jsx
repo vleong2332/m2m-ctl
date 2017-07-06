@@ -63,10 +63,11 @@ class Group extends React.Component {
 	}
 
 	render() {
-		let { config, item, status, associated, associate, disassociate } = this.props;
+		let { ready, config, item, associated, associate, disassociate } = this.props;
 		return (
 			<StyledGroup className="group">
 				<GroupHeader
+					ready={ready}
 					title={item.name}
 					collapsed={this.state.collapsed}
 					setCollapsed={this.setCollapsed}
@@ -75,9 +76,9 @@ class Group extends React.Component {
 					deselectAll={this.deselectAll}
 				/>
 				<Records
+					ready={ready}
 					config={config}
 					list={item.list}
-					status={status}
 					collapsed={this.state.collapsed}
 					associated={associated}
 					associate={associate}

@@ -12,7 +12,7 @@ const StyledRecords = styled.div`
 `;
 
 const renderRecords = props => {
-	let { config, list, status, associated, associate, disassociate } = props;
+	let { config, ready, list, associated, associate, disassociate } = props;
 
 	return list && list.map((item, index) => {
 		let id = item[config.relatedEntPrimaryIdAttr];
@@ -22,10 +22,10 @@ const renderRecords = props => {
 		return (
 			<Record
 				key={index}
+				ready={ready}
 				content={content}
 				logicalName={config.logicalName}
 				entityId={id}
-				status={status}
 				associate={associate}
 				disassociate={disassociate}
 				associated={isAssociated}

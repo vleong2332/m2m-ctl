@@ -22,6 +22,11 @@ const	Config = {
 		t.records = [];
 	},
 
+	initIsSuccessful: function() {
+		let t = this;
+		return !!(t.api && t.schemaName && t.displayField && t.thisEntName && t.thisEntId);
+	},
+
 	configure: function(metadata) {
 		let m = metadata;
 		let t = this;
