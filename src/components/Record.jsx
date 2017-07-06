@@ -8,7 +8,7 @@ const StyledRecord = styled.div`
 	background-color: ${({ associated }) => associated ? 'steelblue' : 'initial'};
 	color: ${({ associated }) => associated ? 'white' : 'initial'};
 	font-weight: ${({ associated }) => associated ? 'bold' : 'normal'};
-	pointer-events: ${({ status }) => status === 'busy' ? 'none' : 'auto'};
+	pointer-events: ${({ ready }) => ready ? 'auto' : 'none'};
 `;
 
 const PhantomRecord = styled.div`

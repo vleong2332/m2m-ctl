@@ -13,6 +13,8 @@ import {
 	getEntityMetadata,
 	getRelatedEntityRecords,
 	getCurrentlyAssociated,
+	getFieldType,
+	getOptionSetOptions,
 	associateInPort,
 	disassociateInPort
 } from './modules/Helper';
@@ -219,7 +221,7 @@ class App extends Component {
 				return getRelatedEntityRecords(c.api, c.relatedEntCollName, select);
 			})
 
-			// ... and store them in the state.
+			// ... and (group and) store them in the state.
 			.then(records => {
 				this.removeQueue(relatedEntRecordsKey);
 
@@ -229,7 +231,7 @@ class App extends Component {
 
 				let sortedGroupedRecords = this.getGroupedRecords(records, c.groupByField);
 
-				this.setState({ records: sortedGroupedRecords || records });
+				this.setState({ records: sortedGroupedRecords || records }, this.mapGroupName);
 			})
 
 			// Get currently associated related records, ...
@@ -301,6 +303,61 @@ class App extends Component {
 			this.removeQueue(groupingKey);
 		}
 		return result;
+	}
+
+	mapGroupName() {
+		if (!Config.groupByField) {
+			return;
+		}
+
+		let fieldTypeKey = this.addQueue('Getting field type of group-by field');
+		let optionSetKey = this.addQueue('Getting option set for group name');
+
+		// Start a promise chain by getting info on a field, ...
+		getFieldType(Config.api, Config.relatedEntName, Config.groupByField)
+
+			// then get the optionset options.
+			.then(type => {
+				this.removeQueue(fieldTypeKey);
+
+				if (!type || type.toLowerCase() !== 'picklist') {
+					this.removeQueue(optionSetKey);
+					return;
+				}
+
+				return getOptionSetOptions(Config.api, Config.relatedEntName, Config.groupByField);
+			})
+
+			// Go through each group and change the name of it to the label of the option.
+			.then(options => {
+				this.removeQueue(optionSetKey);
+
+				if (!options) {
+					return;
+				}
+
+				let groupedRecords = this.state.records;
+
+				groupedRecords.forEach(group => {
+					if (group.name === 'null' || group.name === 'undefined' || group.name === '') {
+						group.name = 'Unknown';
+					} else {
+						// eslint-disable-next-line
+						let option = options.find(opt => opt.Value.toString() == group.name.toString());
+
+						if (option) {
+							group.name = option.Label.UserLocalizedLabel.Label;
+						}
+					}
+				});
+
+				this.setState({ records: groupedRecords });
+			})
+
+			.catch(err => {
+				console.error(err);
+				this.addError(err.message);
+			});
 	}
 
 	isReady(errors, queue) {

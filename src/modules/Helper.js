@@ -45,6 +45,24 @@ export function getCurrentlyAssociated(api, collectionName, id, schemaName, sele
 		.then(resp => resp && JSON.parse(resp).value);
 }
 
+export function getFieldType(api, entName, fieldName) {
+	return Ajax.getWithPromise(`${api}/EntityDefinitions(LogicalName='${entName}')` +
+		`/Attributes(LogicalName='${fieldName}')?` +
+		`$select=AttributeType`
+	)
+		.then(resp => resp && JSON.parse(resp).AttributeType)
+		.catch(console.error);
+}
+
+export function getOptionSetOptions(api, entName, fieldName) {
+	return Ajax.getWithPromise(`${api}/EntityDefinitions(LogicalName='${entName}')` +
+		`/Attributes/Microsoft.Dynamics.CRM.PicklistAttributeMetadata?` +
+		`$filter=LogicalName eq '${fieldName}'&` +
+		`$expand=OptionSet`
+	)
+		.then(resp => resp && JSON.parse(resp).value[0].OptionSet.Options)
+		.catch(console.error)
+}
 
 export function associateInPort(recordId, config) {
 	let { api, schemaName, thisEntCollName, thisEntId, relatedEntCollName } = config;
