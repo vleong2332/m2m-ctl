@@ -90,14 +90,13 @@
 		<div id="root">
 
 			<div class="container">
+				<form id="config-form" action="" method="POST" onsubmit="return handleSubmit()">
 
-				<div class="container-header">
-					<h1>m2m-ctl configuration</h1>
-				</div>
+					<div class="container-header">
+						<h1>m2m-ctl configuration</h1>
+					</div>
 
-				<div class="container-body">
-					<form id="config-form" action="" method="POST" onsubmit="return handleSubmit()">
-
+					<div class="container-body">
 						<div class="form-row">
 							<label for="schema-name">
 								<div class="label">Schema Name</div>
@@ -119,14 +118,13 @@
 								<div class="help-text">The field by which the related list will be grouped. Right now it only supports field of type text and picklist.</div>
 							</label>
 						</div>
+					</div>
 
-					</form>
-				</div>
+					<div class="container-footer">
+						<button class="submit" name="submit" type="submit">Generate</button>
+					</div>
 
-				<div class="container-footer">
-					<button class="submit" name="submit" type="submit">Generate</button>
-				</div>
-
+				</form>
 			</div>
 
 			<div class="container">

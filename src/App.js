@@ -127,10 +127,16 @@ class App extends Component {
 	componentWillMount() {
 		try {
 			let data = this.getData(window.location.search);
+
+			if (!data) {
+				throw new Error('Missing web resource data');
+			}
+
+			Config.init(this.props.xrm, data);
+
 			let thisEntName = getParam(window.location.search, 'typename');
 			let thisEntId = this.getId(window.location.search);
 
-			Config.init(this.props.xrm, data);
 			Config.thisEntName = thisEntName;
 			Config.thisEntId = thisEntId && thisEntId.replace(/{|}/g, '');
 		} catch (err) {
@@ -142,7 +148,7 @@ class App extends Component {
 	componentDidMount() {
 		let c = Config;
 
-		if (!c.initIsSuccessful) {
+		if (!c || !c.initIsSuccessful()) {
 			this.addError('Config is improperly configured.');
 			return;
 		}
