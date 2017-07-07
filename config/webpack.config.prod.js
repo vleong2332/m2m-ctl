@@ -67,7 +67,8 @@ module.exports = {
 		// chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
     chunkFilename: 'js/[name].chunk.js',
     // We inferred the "public path" (such as / or /my-project) from homepage.
-    publicPath: publicPath,
+		// NOTE: (leongv) I override so that, when embedded in CRM, it will request the correct path.
+    publicPath: '.' + publicPath,
     // Point sourcemap entries to original disk location
     devtoolModuleFilenameTemplate: info =>
       path.relative(paths.appSrc, info.absoluteResourcePath),
