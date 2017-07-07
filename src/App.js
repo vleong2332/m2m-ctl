@@ -266,17 +266,12 @@ class App extends Component {
 
 	getData(url) {
 		try {
-			// let data = getParam(url, 'data');
-			// return JSON.parse(decodeURIComponent(data));
+			let data = getParam(url, 'data');
+			return JSON.parse(decodeURIComponent(data));
 		} catch (err) {
 			console.error(err);
 			this.addError('Error in parsing extra data. Is it passed in as an encoded string?')
 		}
-		return {
-			schemaName: 'wa_wa_project_wa_book',
-			displayField: 'wa_name',
-			groupByField: 'wa_testament'
-		};
 	}
 
 	getId(url) {
