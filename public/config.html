@@ -159,11 +159,11 @@
 				var data = {
 					schemaName: form.elements['schema-name'].value,
 					displayField: form.elements['display-field'].value,
-					groupBy: form.elements['group-by'].value
+					groupByField: form.elements['group-by'].value
 				};
 				var cleanedData = cleanData(data);
 
-				resultBox.value = encodeURI(JSON.stringify(cleanedData));
+				resultBox.value = JSON.stringify(cleanedData, null, 2);
 			} catch (error) {
 				console.error(error);
 			} finally {
