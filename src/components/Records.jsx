@@ -12,8 +12,14 @@ const StyledRecords = styled.div`
 	overflow: hidden;
 `;
 
+const shouldRecordShow = (config, filter, isAssociated) => (
+	(filter === config.FILTER_ALL) ||
+	(filter === config.FILTER_SELECTED && isAssociated) ||
+	(filter === config.FILTER_UNSELECTED && !isAssociated)
+);
+
 const renderRecords = props => {
-	let { config, ready, list, associated, associate, disassociate } = props;
+	let { filter, config, ready, list, associated, associate, disassociate } = props;
 
 	return list && list.map((item, index) => {
 		let id = item[config.relatedEntPrimaryIdAttr];
@@ -21,16 +27,18 @@ const renderRecords = props => {
 		let isAssociated = associated.indexOf(id) !== -1;
 
 		return (
-			<Record
-				key={index}
-				ready={ready}
-				content={content}
-				logicalName={config.logicalName}
-				entityId={id}
-				associate={associate}
-				disassociate={disassociate}
-				associated={isAssociated}
-			/>
+			shouldRecordShow(config, filter, isAssociated) ?
+				<Record
+					key={index}
+					ready={ready}
+					content={content}
+					logicalName={config.logicalName}
+					entityId={id}
+					associate={associate}
+					disassociate={disassociate}
+					associated={isAssociated}
+				/> :
+				null
 		);
 	});
 };

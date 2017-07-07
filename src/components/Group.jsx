@@ -63,7 +63,8 @@ class Group extends React.Component {
 	}
 
 	render() {
-		let { ready, config, item, associated, associate, disassociate } = this.props;
+		let { ready, filter, config, item, associated, associate, disassociate } = this.props;
+		
 		return (
 			<StyledGroup className="group">
 				<GroupHeader
@@ -76,6 +77,7 @@ class Group extends React.Component {
 					deselectAll={this.deselectAll}
 				/>
 				<Records
+					filter={filter}
 					ready={ready}
 					config={config}
 					list={item.list}

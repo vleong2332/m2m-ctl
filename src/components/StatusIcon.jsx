@@ -13,7 +13,7 @@ const StatusIconOk = styled.div`
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background-color: green;
+	background-color: lightgreen;
 `;
 
 const StatusIconWarning = styled.div`
@@ -27,14 +27,14 @@ const StatusIconError = styled.div`
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background-color: red;
+	background-color: orangered;
 `;
 
 const StatusIconBusy = styled.div`
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
-	border: 1px solid green;
+	border: 1px solid lightgreen;
 `;
 
 const renderStatusIcon = status => {

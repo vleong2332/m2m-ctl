@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import groupBy from 'lodash.groupby';
 
+import Filter from './components/Filter';
 import Notification from './components/Notification';
 import Records from './components/Records';
 import GroupedRecords from './components/GroupedRecords';
@@ -45,6 +46,7 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			filter: Config.FILTER_ALL,
 			errors: [],
 			queue: [],
 			records: [],
@@ -55,6 +57,7 @@ class App extends Component {
 		this.removeQueue = this.removeQueue.bind(this);
 		this.associate = this.associate.bind(this);
 		this.disassociate = this.disassociate.bind(this);
+		this.switchFilter = this.switchFilter.bind(this);
 		this.getData = this.getData.bind(this);
 		this.getId = this.getId.bind(this);
 		this.getGroupedRecords = this.getGroupedRecords.bind(this);
@@ -118,6 +121,13 @@ class App extends Component {
 				console.error(err);
 				this.addError('Disassociate failed');
 			});
+	}
+
+	switchFilter(val, cb) {
+		let filter = (val !== Config.FILTER_SELECTED && val !== Config.FILTER_UNSELECTED ) ?
+			Config.FILTER_ALL :
+			val;
+		this.setState({ filter }, cb);
 	}
 
 	/**
@@ -375,10 +385,16 @@ class App extends Component {
 
     return (
       <StyledApp className="app" ready={ready}>
+				<Filter
+					filters={Config.filters}
+					currentFilter={this.state.filter}
+					switchFilter={this.switchFilter}
+				/>
 				<ContentPanel className="content-panel">
 					{
 						Config.groupByField ?
 							<GroupedRecords
+								filter={this.state.filter}
 								ready={ready}
 								config={Config}
 								list={records}
@@ -387,6 +403,7 @@ class App extends Component {
 								disassociate={this.disassociate}
 							/> :
 							<Records
+								filter={this.state.filter}
 								ready={ready}
 								config={Config}
 								list={records}

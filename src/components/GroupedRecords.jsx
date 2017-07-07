@@ -9,7 +9,7 @@ const StyledGroupedRecords = styled.div`
 
 const GroupedRecords = props => {
 	let { list, ...rest } = props;
-
+	
 	return (
 		<StyledGroupedRecords className="grouped-records">
 			{
