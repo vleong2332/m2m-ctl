@@ -18,6 +18,11 @@ const FilterItem = styled.span`
 const renderFilter = props => {
 	let { filters, currentFilter, switchFilter } = props;
 
+	if (!filters) {
+		console.log('No filters found');
+		return null;
+	}
+
 	return filters.map((filter, index) => {
 		return (
 			<FilterItem

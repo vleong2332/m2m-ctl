@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import groupBy from 'lodash.groupby';
+import reducers from './reducers';
 
 import Filter from './components/Filter';
 import Notification from './components/Notification';
@@ -65,27 +66,21 @@ class App extends Component {
 	}
 
 	/**
-	 * "Actions" and "Reducers"
+	 * "Actions"
 	 */
 
 	addError(message, cb) {
-		let errors = this.state.errors.slice(0,);
-		errors.push(message);
-		this.setState({ errors }, cb);
+		this.setState(reducers.addError(message), cb);
 	}
 
 	addQueue(message, cb) {
 		let key = Date.now();
-		let queue = this.state.queue.slice(0,);
-		queue.push({ key, message });
-		this.setState({ queue }, cb);
+		this.setState(reducers.enqueue(key, message), cb);
 		return key;
 	}
 
 	removeQueue(key, cb) {
-		let queue = this.state.queue.slice(0,);
-		let cleanedQueue = queue.filter(el => el.key !== key);
-		this.setState({ queue: cleanedQueue }, cb);
+		this.setState(reducers.dequeue(key), cb);
 	}
 
 	associate(recordId, cb) {
@@ -93,9 +88,7 @@ class App extends Component {
 
 		associateInPort(recordId, Config)
 			.then(resp => {
-				let associated = this.state.associated.slice(0,);
-				associated.push(recordId);
-				this.setState({ associated }, () => {
+				this.setState(reducers.addAssociated(recordId), () => {
 					this.removeQueue(queueKey);
 					cb && cb();
 				});
@@ -112,8 +105,7 @@ class App extends Component {
 
 		disassociateInPort(recordId, Config)
 			.then(resp => {
-				let associated = this.state.associated.filter(id => id !== recordId);
-				this.setState({ associated }, () => {
+				this.setState(reducers.removeAssociated(recordId), () => {
 					this.removeQueue(queueKey);
 				});
 			})
