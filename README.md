@@ -20,7 +20,7 @@ The current development method relies on Fiddler, a program that can intercept o
 
 Your Fiddler's AutoResponder should look something like this:
 
-![Image of AutoResponder's setting](./img/fiddler_autoresponder_setting.jpg)
+![Image of AutoResponder's setting](./img/fiddler_autoresponder_setting.JPG)
 
 ### Fiddler Tips
 
