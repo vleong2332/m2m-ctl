@@ -22,11 +22,11 @@ Your Fiddler's AutoResponder should look something like this:
 
 ![Image of AutoResponder's setting](./img/fiddler_autoresponder_setting.JPG)
 
-### Fiddler Tips
+## Fiddler Tips
 
 * *HTTPS* - Your Fiddler may not work correctly with HTTPS connections. There is a way to make it work if you look it up online.
 * *Capturing* - To avoid too many noise, limit logging to as little sessions as possible and only capture browser traffic.
 
 ## Original `create-react-app` Template
 
-Read it (here)[https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md]
+Read it [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md)
