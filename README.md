@@ -30,3 +30,7 @@ Your Fiddler's AutoResponder should look something like this:
 ## Original `create-react-app` Template
 
 Read it [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md)
+
+## Contributing
+
+Besides making sure that unit tests are written for your changes, run the test (`npm test`) to make sure that your changes don't break anything.
