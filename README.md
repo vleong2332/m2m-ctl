@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/WycliffeAssociates/m2m-ctl.svg?branch=master)](https://travis-ci.org/WycliffeAssociates/m2m-ctl)
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 ## Prerequisites
