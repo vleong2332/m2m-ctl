@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/WycliffeAssociates/m2m-ctl.svg?branch=master)](https://travis-ci.org/WycliffeAssociates/m2m-ctl)
+[![Build Status](https://travis-ci.org/WycliffeAssociates/m2m-ctl.svg?branch=master)](https://travis-ci.org/WycliffeAssociates/m2m-ctl) [![codecov](https://codecov.io/gh/WycliffeAssociates/m2m-ctl/branch/master/graph/badge.svg)](https://codecov.io/gh/WycliffeAssociates/m2m-ctl)
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
