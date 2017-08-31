@@ -5,7 +5,7 @@ import isEqual from 'lodash.isequal';
 import GroupHeader from './GroupHeader';
 import Records from './Records';
 
-const StyledGroup = styled.div`
+const Root = styled.div`
 	margin-top: 0.75rem;
 
 	&:first-of-type {
@@ -64,9 +64,9 @@ class Group extends React.Component {
 
 	render() {
 		let { ready, filter, config, item, associated, associate, disassociate } = this.props;
-		
+
 		return (
-			<StyledGroup className="group">
+			<Root className="group">
 				<GroupHeader
 					ready={ready}
 					title={item.name}
@@ -86,7 +86,7 @@ class Group extends React.Component {
 					associate={associate}
 					disassociate={disassociate}
 				/>
-			</StyledGroup>
+			</Root>
 		);
 	}
 

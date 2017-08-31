@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const StyledStatusIcon = styled.div`
+const Root = styled.div`
 	flex: 0 0 24px;
 	height: 24px;
 	display: flex;
@@ -9,46 +9,27 @@ const StyledStatusIcon = styled.div`
 	justify-content: center;
 `;
 
-const StatusIconOk = styled.div`
-	width: 8px;
-	height: 8px;
+const Dot = styled.div`
 	border-radius: 50%;
-	background-color: lightgreen;
+	width: ${({status}) => status === 'busy' ? '7px' : '8px'};
+	height: ${({status}) => status === 'busy' ? '7px' : '8px'};
+	border: ${({status}) => status === 'busy' ? '1px solid lightgreen' : 'none'};
+	background-color: ${({status}) => (
+		status === 'error'
+			? 'orangered'
+			: status === 'warning'
+				? 'yellow'
+				: status === 'busy'
+					? 'transparent'
+					: 'lightgreen'
+	)};
 `;
-
-const StatusIconWarning = styled.div`
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background-color: yellow;
-`;
-
-const StatusIconError = styled.div`
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background-color: orangered;
-`;
-
-const StatusIconBusy = styled.div`
-	width: 7px;
-	height: 7px;
-	border-radius: 50%;
-	border: 1px solid lightgreen;
-`;
-
-const renderStatusIcon = status => {
-	return status === 'error' ? <StatusIconError /> :
-		status === 'warning' ? <StatusIconWarning /> :
-			status === 'busy' ? <StatusIconBusy /> :
-				<StatusIconOk />;
-};
 
 const StatusIcon = ({ status }) => {
 	return (
-		<StyledStatusIcon className="status-icon">
-			{renderStatusIcon(status)}
-		</StyledStatusIcon>
+		<Root className="status-icon">
+			<Dot status={status} />
+		</Root>
 	);
 };
 

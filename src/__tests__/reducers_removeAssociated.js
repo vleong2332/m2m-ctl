@@ -5,10 +5,10 @@ const recordId2 = 456;
 const recordId3 = 789;
 const recordIdNotInList = 999;
 
-const emptyAssociated = { associated: [] };
-const oneInAssociated = { associated: [recordId1] };
-const twoInAssociated = { associated: [recordId1, recordId2] };
-const threeInAssociated = { associated: [recordId1, recordId2, recordId3] };
+const emptyAssociated = { associatedIds: [] };
+const oneInAssociated = { associatedIds: [recordId1] };
+const twoInAssociated = { associatedIds: [recordId1, recordId2] };
+const threeInAssociated = { associatedIds: [recordId1, recordId2, recordId3] };
 
 describe('removeAssociated', () => {
 
@@ -23,26 +23,26 @@ describe('removeAssociated', () => {
   it(`doesn't remove anything if list is empty`, () => {
     let prevState = emptyAssociated;
     let newState = removeAssociated(recordId1)(prevState);
-    expect(newState.associated).toEqual([]);
+    expect(newState.associatedIds).toEqual([]);
   });
 
   it(`removes a record id if id matches`, () => {
     let prevState = oneInAssociated;
     let newState = removeAssociated(recordId1)(oneInAssociated);
-    expect(newState.associated).toEqual([]);
+    expect(newState.associatedIds).toEqual([]);
   });
 
   it('removes only the record id whose id matches', () => {
     let prevState = threeInAssociated;
 
     let newState1 = removeAssociated(recordId1)(prevState);
-    expect(newState1.associated).toEqual([ recordId2, recordId3 ]);
+    expect(newState1.associatedIds).toEqual([ recordId2, recordId3 ]);
 
     let newState2 = removeAssociated(recordId2)(prevState);
-    expect(newState2.associated).toEqual([ recordId1, recordId3 ]);
+    expect(newState2.associatedIds).toEqual([ recordId1, recordId3 ]);
 
     let newState3 = removeAssociated(recordId3)(prevState);
-    expect(newState3.associated).toEqual([ recordId1, recordId2 ]);
+    expect(newState3.associatedIds).toEqual([ recordId1, recordId2 ]);
   });
 
   it('returns the same list if record id is not found in queue', () => {
@@ -69,10 +69,10 @@ describe('removeAssociated', () => {
     'abc', '', '   ',
   ]
   .forEach(stateVal => {
-    it(`defaults associated to [] if "state" = ${stateVal}`, () => {
+    it(`defaults associatedIds to [] if "state" = ${stateVal}`, () => {
       let prevState = stateVal;
       let newState = removeAssociated(recordId1)(prevState);
-      expect(newState.associated).toEqual([]);
+      expect(newState.associatedIds).toEqual([]);
     });
   });
 
@@ -86,10 +86,10 @@ describe('removeAssociated', () => {
     'abc', '', '   ',
   ]
   .forEach(queueVal => {
-    it(`defaults associated to [] if state.associated = ${queueVal}`, () => {
-      let prevState = { associated: queueVal };
+    it(`defaults associatedIds to [] if state.associatedIds = ${queueVal}`, () => {
+      let prevState = { associatedIds: queueVal };
       let newState = removeAssociated(recordId1)(prevState);
-      expect(newState.associated).toEqual([]);
+      expect(newState.associatedIds).toEqual([]);
     });
   });
 

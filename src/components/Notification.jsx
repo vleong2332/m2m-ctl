@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Message from './Message';
 import StatusIcon from './StatusIcon';
 
-const StyledNotification = styled.div`
+const Root = styled.div`
 	flex: 0 0 auto;
 	display: flex;
 	flex-direction: row;
@@ -13,28 +13,26 @@ const StyledNotification = styled.div`
 	width: 100%;
 `;
 
-const getMessage = ({ errors, queue }) => {
-	return errors.length > 0 ?
-		errors[0] :
-		queue.length > 0 ?
-			queue[0].message :
-			'Ready';
-};
+const Notification = ({ errors, queue }) => {
+	let message;
+	let status;
 
-const getStatus = ({ errors, queue }) => {
-	return errors.length > 0 ?
-		'error' :
-		queue.length > 0 ?
-			'busy' :
-			'ok';
-};
+	if (errors.length > 0) {
+		message = errors[0];
+		status = 'error';
+	} else if (queue.length > 0) {
+		message = queue[0].message;
+		status = 'busy';
+	} else {
+		message = 'Ready';
+		status = 'ok';
+	}
 
-const Notification = props => {
 	return (
-		<StyledNotification className="notification">
-			<Message message={getMessage(props)} />
-			<StatusIcon status={getStatus(props)} />
-		</StyledNotification>
+		<Root className="notification">
+			<Message text={message} />
+			<StatusIcon status={status} />
+		</Root>
 	);
 };
 

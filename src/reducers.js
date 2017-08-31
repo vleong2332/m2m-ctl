@@ -34,7 +34,7 @@ export const dequeue = key => (prevState, _) => {
     ? prevState.queue.slice(0,)
     : [];
 
-  if (queue.length && typeof key === 'number' || isNonEmptyStr(key)) {
+  if (queue.length && (typeof key === 'number' || isNonEmptyStr(key))) {
     queue = queue.filter(el => el.key !== key);
   }
 
@@ -42,22 +42,22 @@ export const dequeue = key => (prevState, _) => {
 };
 
 export const addAssociated = recordId => (prevState, _) => {
-  let associated =
-    prevState && prevState.associated && Array.isArray(prevState.associated)
-    ? prevState.associated.slice(0,)
+  let associatedIds =
+    prevState && prevState.associatedIds && Array.isArray(prevState.associatedIds)
+    ? prevState.associatedIds.slice(0,)
     : [];
 
-  associated.push(recordId);
-  return { associated };
+  associatedIds.push(recordId);
+  return { associatedIds };
 };
 
 export const removeAssociated = recordId => (prevState, _) => {
-  let associated =
-    prevState && prevState.associated && Array.isArray(prevState.associated)
-    ? prevState.associated.slice(0,)
+  let associatedIds =
+    prevState && prevState.associatedIds && Array.isArray(prevState.associatedIds)
+    ? prevState.associatedIds.slice(0,)
     : [];
 
-  return { associated: associated.filter(id => id !== recordId) };
+  return { associatedIds: associatedIds.filter(id => id !== recordId) };
 };
 
 const reducers = {

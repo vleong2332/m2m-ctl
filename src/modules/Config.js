@@ -1,12 +1,4 @@
-const FILTER_ALL = 0;
-const FILTER_SELECTED = 1;
-const FILTER_UNSELECTED = 2;
-
 const	Config = {
-
-	FILTER_ALL: FILTER_ALL,
-	FILTER_SELECTED: FILTER_SELECTED,
-	FILTER_UNSELECTED: FILTER_UNSELECTED,
 
 	init: function(xrm, { schemaName, displayField, groupByField }) {
 		if (!xrm || !schemaName || !displayField) {
@@ -28,11 +20,6 @@ const	Config = {
 		t.relatedEntCollName = undefined;
 		t.relatedEntPrimaryIdAttr = undefined;
 		t.records = [];
-		t.filters = [
-			{ name: 'All', value: FILTER_ALL },
-			{ name: 'Selected', value: FILTER_SELECTED },
-			{ name: 'Unselected', value: FILTER_UNSELECTED }
-		];
 	},
 
 	initIsSuccessful: function() {

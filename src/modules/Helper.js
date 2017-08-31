@@ -84,3 +84,18 @@ export function disassociateInPort(recordId, config) {
 		.then(resp => resp, error => error)
 		.catch(console.error);
 }
+
+
+const Helper = {
+	getParam,
+	getRelationshipMetadata,
+	getEntityMetadata,
+	getRelatedEntityRecords,
+	getCurrentlyAssociated,
+	getFieldType,
+	getOptionSetOptions,
+	associateInPort,
+	disassociateInPort,
+};
+
+export default Helper;

@@ -14,15 +14,15 @@ describe('addAssociated', () => {
   });
 
   it('adds a record id to an empty list', () => {
-    let prevState = { associated: [] };
+    let prevState = { associatedIds: [] };
     let newState = addAssociated(newRecordId)(prevState);
-    expect(newState.associated).toEqual([ newRecordId ]);
+    expect(newState.associatedIds).toEqual([ newRecordId ]);
   });
 
   it('adds a record id to a non-empty list', () => {
-    let prevState = { associated: [ initRecordId ] };
+    let prevState = { associatedIds: [ initRecordId ] };
     let newState = addAssociated(newRecordId)(prevState);
-    expect(newState.associated).toEqual([ initRecordId, newRecordId ]);
+    expect(newState.associatedIds).toEqual([ initRecordId, newRecordId ]);
   });
 
   // Invalid "state" args
@@ -35,10 +35,10 @@ describe('addAssociated', () => {
     'abc', '', '   ',
   ]
   .forEach(stateVal => {
-    it(`defaults state.associated to [] if state = ${stateVal}`, () => {
+    it(`defaults state.associatedIds to [] if state = ${stateVal}`, () => {
       let prevState = stateVal;
       let newState = addAssociated(newRecordId)(prevState);
-      expect(newState.associated).toEqual([ newRecordId ]);
+      expect(newState.associatedIds).toEqual([ newRecordId ]);
     });
   });
 
@@ -52,10 +52,10 @@ describe('addAssociated', () => {
     'abc', '', '   ',
   ]
   .forEach(associatedVal => {
-    it(`defaults state.associated to [] if it = ${associatedVal}`, () => {
+    it(`defaults state.associatedIds to [] if it = ${associatedVal}`, () => {
       let prevState = { errors: associatedVal };
       let newState = addAssociated(newRecordId)(prevState);
-      expect(newState.associated).toEqual([ newRecordId ]);
+      expect(newState.associatedIds).toEqual([ newRecordId ]);
     });
   });
 

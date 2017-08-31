@@ -1,49 +1,26 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const StyledFilter = styled.div`
+import FilterItem from './FilterItem';
+
+const Root = styled.div`
 	flex: 0 0 auto;
 	width: 100%;
 	margin-bottom: 0.5rem;
 `;
 
-const FilterItem = styled.span`
-	color: ${({currentFilter, filterValue}) => filterValue === currentFilter? '#000': '#666'};
-	font-weight: 600;
-	margin-left: ${({first}) => first ? '0' : '0.3rem'};
-	margin-right: 0.3rem;
-	cursor: pointer;
-`;
-
-const renderFilter = props => {
-	let { filters, currentFilter, switchFilter } = props;
-
-	if (!filters) {
-		console.log('No filters found');
-		return null;
-	}
-
-	return filters.map((filter, index) => {
-		return (
-			<FilterItem
-				key={index}
-				className="filter-item"
-				currentFilter={currentFilter}
-				filterValue={filter.value}
-				first={index === 0}
-				onClick={() => switchFilter(filter.value)}
-			>
-				{filter.name}
-			</FilterItem>
-		);
-	});
-};
-
-const Filter = props => {
+const Filter = ({ filters, currentFilter, onFilterItemClick }) => {
 	return (
-		<StyledFilter className="filters">
-			{renderFilter(props)}
-		</StyledFilter>
+		<Root className="filter">
+			{filters && filters.map((filter, index) => (
+				<FilterItem
+					key={index}
+					text={filter.name}
+					isActive={filter.value === currentFilter}
+					onClick={() => onFilterItemClick(filter.value)}
+				/>
+			))}
+		</Root>
 	);
 };
 

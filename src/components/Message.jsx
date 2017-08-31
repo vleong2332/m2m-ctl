@@ -1,17 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const StyledMessage = styled.p`
+const Root = styled.p`
 	flex: 1 1 auto;
 	padding: 0.25rem;
 	margin: 0;
 `;
 
-const Message = ({ message }) => {
+const Message = ({ text }) => {
 	return (
-		<StyledMessage className="message">
-			{message}
-		</StyledMessage>
+		<Root className="message">
+			{text}
+		</Root>
 	);
 };
 
