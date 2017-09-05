@@ -1,17 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
 
+import { StyledNotification } from './style';
 import Message from './components/Message';
 import StatusIcon from './components/StatusIcon';
-
-const Root = styled.div`
-	flex: 0 0 auto;
-	display: flex;
-	flex-direction: row;
-	background-color: #333;
-	color: #FFF;
-	width: 100%;
-`;
 
 const Notification = ({ errors, queue }) => {
 	let message;
@@ -29,10 +20,10 @@ const Notification = ({ errors, queue }) => {
 	}
 
 	return (
-		<Root className="notification">
+		<StyledNotification className="notification">
 			<Message text={message} />
 			<StatusIcon status={status} />
-		</Root>
+		</StyledNotification>
 	);
 };
 

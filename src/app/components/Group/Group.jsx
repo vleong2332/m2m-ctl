@@ -12,7 +12,7 @@ class Group extends React.Component {
 		super(props);
 		this.state = {
 			isCollapsed: false,
-			allSelected: this.setAllSelected(),
+			allSelected: this.checkAllSelected(props),
 		};
 		this.toggleIsCollapsed = this.toggleIsCollapsed.bind(this);
 		this.selectAll = this.selectAll.bind(this);
@@ -24,13 +24,16 @@ class Group extends React.Component {
 		this.setState({ isCollapsed: !this.state.isCollapsed });
 	}
 
-	setAllSelected(props = this.props) {
+	checkAllSelected(props) {
 		const { records, config, associatedIds } = props;
 		const unassociatedIdsInGroup = records.list
-			.map(entry => entry[config.relatedEntPrimaryIdAttr])
+			.map(entry => entry[config.relatedEntity.primaryIdAttr])
 			.filter(id => associatedIds.indexOf(id) === -1);
+		return unassociatedIdsInGroup.length === 0;
+	}
 
-		this.setState({ allSelected: unassociatedIdsInGroup.length === 0 });
+	setAllSelected(props = this.props) {
+		this.setState({ allSelected: this.checkAllSelected(props) });
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -41,7 +44,7 @@ class Group extends React.Component {
 
 	selectAll() {
 		const { records, config, batchAssociate, associatedIds } = this.props;
-		const idFieldName = config.relatedEntPrimaryIdAttr;
+		const idFieldName = config.relatedEntity.primaryIdAttr;
 		const unassociatedIdsInGroup = records.list
 			.map(entry => entry[idFieldName])
 			.filter(id => associatedIds.indexOf(id) === -1);
@@ -51,7 +54,7 @@ class Group extends React.Component {
 
 	deselectAll() {
 		const { records, config, batchDisassociate, associatedIds } = this.props;
-		const idFieldName = config.relatedEntPrimaryIdAttr;
+		const idFieldName = config.relatedEntity.primaryIdAttr;
 		const associatedIdsInGroup = records.list
 			.map(entry => entry[idFieldName])
 			.filter(id => associatedIds.indexOf !== -1);

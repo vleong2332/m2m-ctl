@@ -1,7 +1,6 @@
-import React from 'react';
 import styled from 'styled-components';
 
-const Root = styled.div`
+export const StyledStatusIcon = styled.div`
 	flex: 0 0 24px;
 	height: 24px;
 	display: flex;
@@ -9,7 +8,7 @@ const Root = styled.div`
 	justify-content: center;
 `;
 
-const Dot = styled.div`
+export const Dot = styled.div`
 	border-radius: 50%;
 	width: ${({status}) => status === 'busy' ? '7px' : '8px'};
 	height: ${({status}) => status === 'busy' ? '7px' : '8px'};
@@ -24,13 +23,3 @@ const Dot = styled.div`
 					: 'lightgreen'
 	)};
 `;
-
-const StatusIcon = ({ status }) => {
-	return (
-		<Root className="status-icon">
-			<Dot status={status} />
-		</Root>
-	);
-};
-
-export default StatusIcon;

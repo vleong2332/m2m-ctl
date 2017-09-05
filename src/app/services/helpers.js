@@ -21,23 +21,34 @@ export function getId(url) {
   }
 }
 
-export function getGroupedRecords(records, groupByField) {
-  let result;
-  if (groupByField) {
-    let statusMessageKey = this.addQueue('Grouping records');
-    let groupedRecords = groupBy(records, groupByField);
-    let sortedGroups = Object.keys(groupedRecords).sort();
+export function groupRecords(records, groupByField) {
+  let statusMessageKey = this.enqueue('Grouping records');
+  let groupedRecords = groupBy(records, groupByField);
+  let sortedGroups = Object.keys(groupedRecords).sort();
 
-    result = sortedGroups.map(key => ({
-      name: key,
-      list: groupedRecords[key]
-    }));
-
-    this.removeQueue(statusMessageKey);
-  }
-  return result;
+  this.dequeue(statusMessageKey);
+  return sortedGroups.map(key => ({
+    name: key,
+    list: groupedRecords[key]
+  }));
 }
 
 export function isReady(errors, queue) {
   return errors.length <= 0 && queue.length <= 0;
+}
+
+export function refreshData() {
+  this.props.xrm.Page.data.refresh();
+}
+
+export function notify(message, severity = 'INFO', timeToLive = 0) {
+  const key = Date.now().toString();
+
+  this.props.xrm.Page.ui.setFormNotification(message, severity, key);
+
+  if (timeToLive > 0) {
+    setTimeout(() => {
+      this.props.xrm.Page.ui.clearFormNotification(key);
+    }, timeToLive);
+  }
 }
