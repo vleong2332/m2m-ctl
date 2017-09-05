@@ -1,5 +1,4 @@
-import { isNonEmptyStr, getParam } from '.utils';
-
+import { isNonEmptyStr, getParam } from './utils';
 
 describe('isNonEmptyStr()', () => {
 

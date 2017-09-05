@@ -1,4 +1,4 @@
-import Filter from '../components/Filter';
+import Filter from './Filter';
 
 describe('Component: Filter', () => {
 

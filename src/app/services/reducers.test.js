@@ -1,4 +1,12 @@
-import { addAssociated } from '../reducers';
+import {
+  addAssociated,
+  removeAssociated,
+  enqueue,
+  dequeue,
+  addError,
+  defaultQueue,
+  defaultError,
+} from './reducers';
 
 describe('addAssociated', () => {
 
@@ -60,8 +68,6 @@ describe('addAssociated', () => {
   });
 
 });
-
-import { addError, defaultError } from '../reducers';
 
 describe('addError', () => {
 
@@ -152,32 +158,29 @@ describe('addError', () => {
 
 });
 
-
-import { dequeue } from '../reducers';
-
-const item1Key = 123;
-const item2Key = 456;
-const item3Key = 789;
-const notInListKey = 999;
-const item1Msg = 'Doing something';
-const item2Msg = 'Doing nothing';
-const item3Msg = 'Doing everything';
-
-const emptyQueue = { queue: [] };
-const oneInQueue = { queue: [
-  { key: item1Key, message: item1Msg }
-]};
-const twoInQueue = { queue: [
-  { key: item1Key, message: item1Msg },
-  { key: item2Key, message: item2Msg }
-]};
-const threeInQueue = { queue: [
-  { key: item1Key, message: item1Msg },
-  { key: item2Key, message: item2Msg },
-  { key: item3Key, message: item3Msg }
-]};
-
 describe('dequeue', () => {
+
+  const item1Key = 123;
+  const item2Key = 456;
+  const item3Key = 789;
+  const notInListKey = 999;
+  const item1Msg = 'Doing something';
+  const item2Msg = 'Doing nothing';
+  const item3Msg = 'Doing everything';
+
+  const emptyQueue = { queue: [] };
+  const oneInQueue = { queue: [
+    { key: item1Key, message: item1Msg }
+  ]};
+  const twoInQueue = { queue: [
+    { key: item1Key, message: item1Msg },
+    { key: item2Key, message: item2Msg }
+  ]};
+  const threeInQueue = { queue: [
+    { key: item1Key, message: item1Msg },
+    { key: item2Key, message: item2Msg },
+    { key: item3Key, message: item3Msg }
+  ]};
 
   it('is importable', () => {
     expect(dequeue).toBeDefined();
@@ -195,7 +198,7 @@ describe('dequeue', () => {
 
   it(`removes a queue entry if key matches`, () => {
     let prevState = oneInQueue;
-    let newState = dequeue(item1Key)(oneInQueue);
+    let newState = dequeue(item1Key)(prevState);
     expect(newState.queue).toEqual([]);
   });
 
@@ -289,9 +292,6 @@ describe('dequeue', () => {
   });
 
 });
-
-
-import { enqueue, defaultQueue } from '../reducers';
 
 const newKey = 123;
 const initKey = 456;
@@ -430,19 +430,17 @@ describe('enqueue', () => {
 
 });
 
-import { removeAssociated } from '../reducers';
-
-const recordId1 = 123;
-const recordId2 = 456;
-const recordId3 = 789;
-const recordIdNotInList = 999;
-
-const emptyAssociated = { associatedIds: [] };
-const oneInAssociated = { associatedIds: [recordId1] };
-const twoInAssociated = { associatedIds: [recordId1, recordId2] };
-const threeInAssociated = { associatedIds: [recordId1, recordId2, recordId3] };
-
 describe('removeAssociated', () => {
+
+  const recordId1 = 123;
+  const recordId2 = 456;
+  const recordId3 = 789;
+  const recordIdNotInList = 999;
+
+  const emptyAssociated = { associatedIds: [] };
+  const oneInAssociated = { associatedIds: [recordId1] };
+  const twoInAssociated = { associatedIds: [recordId1, recordId2] };
+  const threeInAssociated = { associatedIds: [recordId1, recordId2, recordId3] };
 
   it('is importable', () => {
     expect(removeAssociated).toBeDefined();
@@ -460,7 +458,7 @@ describe('removeAssociated', () => {
 
   it(`removes a record id if id matches`, () => {
     let prevState = oneInAssociated;
-    let newState = removeAssociated(recordId1)(oneInAssociated);
+    let newState = removeAssociated(recordId1)(prevState);
     expect(newState.associatedIds).toEqual([]);
   });
 
