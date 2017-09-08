@@ -6,5 +6,4 @@ export const StyledRecords = styled.div`
 	flex-wrap: wrap;
 	width: 100%;
 	height: ${({isCollapsed}) => isCollapsed ? '0px' : '100%'};
-	overflow: hidden;
 `;
