@@ -24,6 +24,7 @@ const renderRecords = props => {
 			shouldShow(currentFilter, isAssociated)
 				? <Record
 					key={index}
+					visible={item.visible}
 					content={item[config.displayField]}
 					isReady={isReady}
 					isAssociated={isAssociated}

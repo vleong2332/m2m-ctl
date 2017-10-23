@@ -2,7 +2,7 @@ import React from 'react';
 import { StyledRecord } from './style';
 
 const Record = props => {
-	let { content, isReady, isAssociated, onClick } = props;
+	let { content, isReady, isAssociated, onClick, visible } = props;
 
 	return (
 		<StyledRecord
@@ -10,6 +10,7 @@ const Record = props => {
 			isReady={isReady}
 			isAssociated={isAssociated}
 			onClick={onClick}
+			enabled={visible}
 		>
 			{content}
 		</StyledRecord>

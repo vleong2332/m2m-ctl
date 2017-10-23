@@ -2,6 +2,7 @@ import React from 'react';
 import isEqual from 'lodash.isequal';
 import { getParam } from 'services/utils';
 import App from './App';
+import EmptyMessage from './components/EmptyMessage';
 import reducers from './services/reducers';
 import config from './services/config';
 import api from './services/api';
@@ -13,6 +14,7 @@ class AppContainer extends React.Component {
 	constructor(props) {
 		super(props);
     this.state = {
+			isEditForm: this.isEditForm(this.props.xrm),
       currentFilter: FILTER_ALL,
       errors: [],
       queue: [],
@@ -31,6 +33,10 @@ class AppContainer extends React.Component {
 		this.disassociate = this.disassociate.bind(this);
 		this.batchDisassociate = this.batchDisassociate.bind(this);
 		this.switchFilter = this.switchFilter.bind(this);
+	}
+
+	isEditForm(xrm) {
+		return xrm.Page.ui.getFormType() === 2;
 	}
 
   // ===============
@@ -74,31 +80,54 @@ class AppContainer extends React.Component {
   // ===============
 
 	componentWillMount() {
+		if (this.state.isEditForm) {
+			this.getInfoFromURL();
+		}
+	}
+
+	componentDidMount() {
+		if (this.state.isEditForm) {
+			this.getInfoFromAPI();
+		}
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+    const { records, groupedRecords } = this.state;
+
+    if (!isEqual(prevState.records, records) && config.groupByField) {
+      const groupedRecords = groupRecords.call(this, records, config.groupByField);
+      this.groupNamesAreMapped = false;
+      this.setState({ groupedRecords });
+    }
+
+    if (!isEqual(prevState.groupedRecords, groupedRecords) && !this.groupNamesAreMapped) {
+      this.mapGroupName();
+    }
+  }
+
+	getInfoFromURL() {
 		try {
-			const searchString = window.location.search;
-			const extraData = getExtraData.call(this, searchString);
+			const { xrm } = this.props;
+			const extraData = getExtraData.call(this, window.location.search);
       const hasRequiredConfig = !!(extraData || extraData.schemaName || extraData.displayField);
 
 			if (!hasRequiredConfig) {
 				throw new Error('Missing required configuration data.');
 			}
 
-      const thisEntityId = getId.call(this, searchString);
-      const thisEntityName = getParam(searchString, 'typename');
-
-      config.apiUrl = this.props.xrm.Page.context.getClientUrl() + '/api/data/v8.2';
+      config.apiUrl = xrm.Page.context.getClientUrl() + '/api/data/v8.2';
       config.schemaName = extraData.schemaName;
       config.displayField = extraData.displayField;
       config.groupByField = extraData.groupByField;
-      config.thisEntity.id = thisEntityId;
-			config.thisEntity.name = thisEntityName;
+			config.thisEntity.id = xrm.Page.data.entity.getId().replace(/{|}/g, '');
+			config.thisEntity.name = xrm.Page.data.entity.getEntityName();
 		} catch (error) {
 			console.error(error);
 			this.addError(error.message);
 		}
 	}
 
-	async componentDidMount() {
+	async getInfoFromAPI() {
 		if (!config || !config.hasRequiredProps()) {
 			this.addError('Configuration is missing required props.');
 			return;
@@ -131,20 +160,6 @@ class AppContainer extends React.Component {
 			this.addError(error.message);
 		}
 	}
-
-  componentDidUpdate(prevProps, prevState) {
-    const { records, groupedRecords } = this.state;
-
-    if (!isEqual(prevState.records, records) && config.groupByField) {
-      const groupedRecords = groupRecords.call(this, records, config.groupByField);
-      this.groupNamesAreMapped = false;
-      this.setState({ groupedRecords });
-    }
-
-    if (!isEqual(prevState.groupedRecords, groupedRecords) && !this.groupNamesAreMapped) {
-      this.mapGroupName();
-    }
-  }
 
   // ====================================
 	// METHODS USED INSIDE LIFECYCLE HOOOKS
@@ -281,6 +296,12 @@ class AppContainer extends React.Component {
       resolve([ relatedEntityRecords, associatedRecords ]);
     });
   }
+
+	setRecordVisibility(records, itemsToHide) {
+		return records && itemsToHide && records.map(record => Object.assign({}, record, {
+			visible: itemsToHide.find(i => i === record[config.displayField])
+		}));
+	}
 
   async mapGroupName() {
     const { apiUrl, relatedEntity, groupByField } = config;
@@ -452,8 +473,8 @@ class AppContainer extends React.Component {
   // ======
 
   render() {
-    return (
-			<App
+    return this.state.isEditForm
+			? <App
         config={config}
         {...this.state}
         filters={this.filters}
@@ -463,7 +484,7 @@ class AppContainer extends React.Component {
         batchAssociate={this.batchAssociate}
         batchDisassociate={this.batchDisassociate}
       />
-    );
+			: <EmptyMessage>To enable this content, create the record.</EmptyMessage>;
   }
 }
 
