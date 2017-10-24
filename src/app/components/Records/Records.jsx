@@ -13,7 +13,7 @@ const shouldShow = (currentFilter, isAssociated) => (
 );
 
 const renderRecords = props => {
-	const { config, list, currentFilter, isReady, associatedIds, associate, disassociate } = props;
+	const { config, list, currentFilter, isEnabled, associatedIds, associate, disassociate } = props;
 
 	return list && list.map((item, index) => {
 		const id = item[config.relatedEntity.primaryIdAttr];
@@ -24,11 +24,10 @@ const renderRecords = props => {
 			shouldShow(currentFilter, isAssociated)
 				? <Record
 					key={index}
-					visible={item.visible}
 					content={item[config.displayField]}
-					isReady={isReady}
+					isEnabled={isEnabled}
 					isAssociated={isAssociated}
-					onClick={isReady ? () => (isAssociated ? disassociate(id) : associate(id)) : null}
+					onClick={isEnabled ? () => (isAssociated ? disassociate(id) : associate(id)) : null}
 				/>
 				: null
 		);

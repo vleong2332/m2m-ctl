@@ -63,7 +63,7 @@ class Group extends React.Component {
 	}
 
 	render() {
-		const { isReady, currentFilter, config, records, associatedIds, associate, disassociate } = this.props;
+		const { isEnabled, currentFilter, config, records, associatedIds, associate, disassociate } = this.props;
 		const { isCollapsed, allSelected } = this.state;
 
 		return (
@@ -81,7 +81,7 @@ class Group extends React.Component {
 						config={config}
 						list={records.list}
 						currentFilter={currentFilter}
-						isReady={isReady}
+						isEnabled={isEnabled}
 						associatedIds={associatedIds}
 						associate={associate}
 						disassociate={disassociate}

@@ -4,6 +4,7 @@ import { isReady as checkIsReady } from './services/helpers';
 import { StyledApp, MainPanel } from './style.js';
 
 const App = ({
+	isEnabled,
 	config,
 	filters,
 	currentFilter,
@@ -35,7 +36,7 @@ const App = ({
 							config={config}
 							records={records}
 							currentFilter={currentFilter}
-							isReady={isReady}
+							isEnabled={isReady && isEnabled}
 							associatedIds={associatedIds}
 							associate={associate}
 							batchAssociate={batchAssociate}
@@ -47,7 +48,7 @@ const App = ({
 						config={config}
 						list={records}
             currentFilter={currentFilter}
-            isReady={isReady}
+            isEnabled={isReady && isEnabled}
             associatedIds={associatedIds}
             associate={associate}
             disassociate={disassociate}

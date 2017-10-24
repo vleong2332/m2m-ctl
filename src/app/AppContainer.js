@@ -1,12 +1,11 @@
 import React from 'react';
 import isEqual from 'lodash.isequal';
-import { getParam } from 'services/utils';
 import App from './App';
 import EmptyMessage from './components/EmptyMessage';
 import reducers from './services/reducers';
 import config from './services/config';
 import api from './services/api';
-import { getExtraData, getId, groupRecords, refreshData, notify } from './services/helpers';
+import { getExtraData, groupRecords, refreshData, notify } from './services/helpers';
 import { FILTER_ALL, FILTER_SELECTED, FILTER_UNSELECTED } from './services/constants';
 
 class AppContainer extends React.Component {
@@ -94,16 +93,30 @@ class AppContainer extends React.Component {
 	componentDidUpdate(prevProps, prevState) {
     const { records, groupedRecords } = this.state;
 
-    if (!isEqual(prevState.records, records) && config.groupByField) {
+		const recordsAreUpdated = !isEqual(prevState.records, records);
+    if (recordsAreUpdated && config.groupByField) {
       const groupedRecords = groupRecords.call(this, records, config.groupByField);
       this.groupNamesAreMapped = false;
       this.setState({ groupedRecords });
     }
 
-    if (!isEqual(prevState.groupedRecords, groupedRecords) && !this.groupNamesAreMapped) {
+		const groupedRecordsAreUpdated = !isEqual(prevState.groupedRecords, groupedRecords);
+    if (groupedRecordsAreUpdated && !this.groupNamesAreMapped) {
       this.mapGroupName();
     }
+
+		const newFilterFunctionReceived = !isEqual(prevProps.filter, this.props.filter)
+		if (newFilterFunctionReceived) {
+			this.setState({
+				records: this.runProvidedFilter(this.state.records),
+				groupedRecords: this.runProvidedFilter(this.state.groupedRecords)
+		  });
+		}
   }
+
+	componentWillReceiveProps(nextProps) {
+		console.log(this.props, nextProps);
+	}
 
 	getInfoFromURL() {
 		try {
@@ -151,7 +164,10 @@ class AppContainer extends React.Component {
 			const [ relatedEntityRecords, associatedRecords ] =
         await this.getRelatedAndAssociatedRecords();
 
-      this.setState({ records: relatedEntityRecords });
+			console.log('running filter');
+			const filteredRelatedEntityRecords = this.runProvidedFilter(relatedEntityRecords);
+
+      this.setState({ records: filteredRelatedEntityRecords });
       associatedRecords && this.setState({
         associatedIds : associatedRecords.map(record => record[config.relatedEntity.primaryIdAttr])
       });
@@ -297,10 +313,11 @@ class AppContainer extends React.Component {
     });
   }
 
-	setRecordVisibility(records, itemsToHide) {
-		return records && itemsToHide && records.map(record => Object.assign({}, record, {
-			visible: itemsToHide.find(i => i === record[config.displayField])
-		}));
+	runProvidedFilter(relatedEntityRecords) {
+		console.log('provided filter', this.props.filter);
+		return this.props.filter
+			? relatedEntityRecords.filter(r => this.props.filter(r))
+			: relatedEntityRecords;
 	}
 
   async mapGroupName() {
@@ -475,6 +492,7 @@ class AppContainer extends React.Component {
   render() {
     return this.state.isEditForm
 			? <App
+				isEnabled={this.props.isEnabled}
         config={config}
         {...this.state}
         filters={this.filters}
@@ -483,6 +501,7 @@ class AppContainer extends React.Component {
         disassociate={this.disassociate}
         batchAssociate={this.batchAssociate}
         batchDisassociate={this.batchDisassociate}
+				filter={this.filter}
       />
 			: <EmptyMessage>To enable this content, create the record.</EmptyMessage>;
   }
