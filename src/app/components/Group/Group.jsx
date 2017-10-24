@@ -73,7 +73,7 @@ class Group extends React.Component {
 					isCollapsed={isCollapsed}
 					allSelected={allSelected}
 					onExpandIconClick={this.toggleIsCollapsed}
-					onSelectAllClick={allSelected ? this.deselectAll : this.selectAll}
+					onSelectAllClick={isEnabled ? allSelected ? this.deselectAll : this.selectAll : null}
 				/>
 				{isCollapsed
 					? null
