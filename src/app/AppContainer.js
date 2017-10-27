@@ -114,10 +114,6 @@ class AppContainer extends React.Component {
 		}
   }
 
-	componentWillReceiveProps(nextProps) {
-		console.log(this.props, nextProps);
-	}
-
 	getInfoFromURL() {
 		try {
 			const { xrm } = this.props;
@@ -164,7 +160,6 @@ class AppContainer extends React.Component {
 			const [ relatedEntityRecords, associatedRecords ] =
         await this.getRelatedAndAssociatedRecords();
 
-			console.log('running filter');
 			const filteredRelatedEntityRecords = this.runProvidedFilter(relatedEntityRecords);
 
       this.setState({ records: filteredRelatedEntityRecords });
@@ -314,7 +309,6 @@ class AppContainer extends React.Component {
   }
 
 	runProvidedFilter(relatedEntityRecords) {
-		console.log('provided filter', this.props.filter);
 		return this.props.filter
 			? relatedEntityRecords.filter(r => this.props.filter(r))
 			: relatedEntityRecords;

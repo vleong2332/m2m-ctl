@@ -6,8 +6,9 @@ import './index.css';
 const Xrm = window.parent.Xrm;
 const rootEl = document.getElementById('root');
 
-window.customM2MControl = {
-  rerender,
+Xrm.Utility.customM2MControl = {
+  ...Xrm.Utility.customM2MControl,
+  api: { rerender },
 };
 
 ReactDOM.render(<App xrm={Xrm} isEnabled={true} />, rootEl);
@@ -27,6 +28,6 @@ function rerender(config = {}) {
 }
 
 function postMount() {
-  const hook = Xrm.Utility.customM2MControl;
-  hook && hook.postMount && hook.postMount();
+  const hooks = Xrm.Utility.customM2MControl.hooks;
+  hooks && hooks.postMount && hooks.postMount();
 }
