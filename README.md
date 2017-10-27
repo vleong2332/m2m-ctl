@@ -39,3 +39,8 @@ Read it [here](https://github.com/facebookincubator/create-react-app/blob/master
 ## Contributing
 
 Besides making sure that unit tests are written for your changes, run the test (`npm test`) to make sure that your changes don't break anything.
+
+## Troubleshoot
+
+*Q: After deploying the built files with XrmToolBox Web Resource Manager, I got "HTTP 500 - Internal Server Error" when the form tries to load the web resource.*
+A: The cause is unknown at this point, but try to upload the files (html, css, and js) using the built-in web resource upload UI provided by Dynamics CRM.
