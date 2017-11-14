@@ -12,19 +12,19 @@ const Ajax = {};
  * @param mixed data
  */
 Ajax.send = (method, url, successCb, errorCb, data) => {
-	try {
-		let req = Ajax.getXmlRequest(Ajax.getWindow());
-		req.open(method, url, 1);
-		if (method === 'POST') {
-			req.setRequestHeader('Content-type', 'application/json');
-		}
-		req.onreadystatechange = (e) => {
-			Ajax.handleReadyStateChange(e.target, successCb, errorCb);
-		};
-		req.send(data);
-	} catch (e) {
-		Ajax.log(e);
-	}
+  try {
+    let req = Ajax.getXmlRequest(Ajax.getWindow());
+    req.open(method, url, 1);
+    if (method === 'POST') {
+      req.setRequestHeader('Content-type', 'application/json');
+    }
+    req.onreadystatechange = (e) => {
+      Ajax.handleReadyStateChange(e.target, successCb, errorCb);
+    };
+    req.send(data);
+  } catch (e) {
+    Ajax.log(e);
+  }
 };
 // https://gist.github.com/Xeoncross/7663273
 
@@ -37,28 +37,28 @@ Ajax.send = (method, url, successCb, errorCb, data) => {
 
 
 Ajax.sendWithPromise = (url, data) => {
-	let method = data ? 'POST' : 'GET';
-	return new Promise((resolve, reject) => {
-		Ajax.send(method, url, resolve, reject, data);
-	});
+  let method = data ? 'POST' : 'GET';
+  return new Promise((resolve, reject) => {
+    Ajax.send(method, url, resolve, reject, data);
+  });
 }
 
 Ajax.getWithPromise = (url) => {
-	return new Promise((resolve, reject) => {
-		Ajax.send('GET', url, resolve, reject);
-	});
+  return new Promise((resolve, reject) => {
+    Ajax.send('GET', url, resolve, reject);
+  });
 }
 
 Ajax.postWithPromise = (url, data) => {
-	return new Promise((resolve, reject) => {
-		Ajax.send('POST', url, resolve, reject, data);
-	});
+  return new Promise((resolve, reject) => {
+    Ajax.send('POST', url, resolve, reject, data);
+  });
 }
 
 Ajax.deleteWithPromise = (url) => {
-	return new Promise((resolve, reject) => {
-		Ajax.send('DELETE', url, resolve, reject);
-	});
+  return new Promise((resolve, reject) => {
+    Ajax.send('DELETE', url, resolve, reject);
+  });
 }
 
 
@@ -66,27 +66,27 @@ Ajax.deleteWithPromise = (url) => {
 // unit-tested by removing the external dependency.
 
 Ajax.getWindow = () => {
-	return window;
+  return window;
 };
 
 Ajax.getXmlRequest = (windowObj) => {
-	return windowObj.XMLHttpRequest ?
-		new windowObj.XMLHttpRequest() :
-		new windowObj.ActiveXObject('MSXML2.XMLHTTP.3.0');
+  return windowObj.XMLHttpRequest ?
+    new windowObj.XMLHttpRequest() :
+    new windowObj.ActiveXObject('MSXML2.XMLHTTP.3.0');
 };
 
 Ajax.log = (content) => {
-	console.log(content);
+  console.log(content);
 };
 
 Ajax.handleReadyStateChange = (req, successCb, errorCb) => {
-	if (req.readyState >= 4) {
-		if (req.status >= 200 && req.status <= 299) {
-			if (successCb) successCb(req.responseText);
-		} else {
-			if (errorCb) errorCb(req.responseText);
-		}
-	}
+  if (req.readyState >= 4) {
+    if (req.status >= 200 && req.status <= 299) {
+      if (successCb) successCb(req.responseText);
+    } else {
+      if (errorCb) errorCb(req.responseText);
+    }
+  }
 };
 
 export default Ajax;
