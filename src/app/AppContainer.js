@@ -10,10 +10,10 @@ import { FILTER_ALL, FILTER_SELECTED, FILTER_UNSELECTED } from './services/const
 
 class AppContainer extends React.Component {
 
-	constructor(props) {
-		super(props);
+  constructor(props) {
+    super(props);
     this.state = {
-			isEditForm: this.isEditForm(this.props.xrm),
+      isEditForm: this.isEditForm(this.props.xrm),
       currentFilter: FILTER_ALL,
       errors: [],
       queue: [],
@@ -21,48 +21,48 @@ class AppContainer extends React.Component {
       groupedRecords: [],
       associatedIds: []
     };
-		this.filters = [
-			{ name: 'All', value: FILTER_ALL },
-			{ name: 'Selected', value: FILTER_SELECTED },
-			{ name: 'Unselected', value: FILTER_UNSELECTED }
-		];
+    this.filters = [
+      { name: 'All', value: FILTER_ALL },
+      { name: 'Selected', value: FILTER_SELECTED },
+      { name: 'Unselected', value: FILTER_UNSELECTED }
+    ];
     this.groupNamesAreMapped = false;
-		this.associate = this.associate.bind(this);
-		this.batchAssociate = this.batchAssociate.bind(this);
-		this.disassociate = this.disassociate.bind(this);
-		this.batchDisassociate = this.batchDisassociate.bind(this);
-		this.switchFilter = this.switchFilter.bind(this);
-	}
+    this.associate = this.associate.bind(this);
+    this.batchAssociate = this.batchAssociate.bind(this);
+    this.disassociate = this.disassociate.bind(this);
+    this.batchDisassociate = this.batchDisassociate.bind(this);
+    this.switchFilter = this.switchFilter.bind(this);
+  }
 
-	isEditForm(xrm) {
-		return xrm.Page.ui.getFormType() === 2;
-	}
+  isEditForm(xrm) {
+    return xrm.Page.ui.getFormType() === 2;
+  }
 
   // ===============
   // STATE MODIFIERS
   // ===============
 
-	switchFilter(val) {
-		let newFilter = val !== FILTER_SELECTED && val !== FILTER_UNSELECTED
-			? FILTER_ALL
-			: val;
-		this.setState({ currentFilter: newFilter });
-	}
+  switchFilter(val) {
+    let newFilter = val !== FILTER_SELECTED && val !== FILTER_UNSELECTED
+      ? FILTER_ALL
+      : val;
+    this.setState({ currentFilter: newFilter });
+  }
 
-	addError(message) {
-		this.setState(reducers.addError(message));
-	}
+  addError(message) {
+    this.setState(reducers.addError(message));
+  }
 
-	enqueue(message) {
+  enqueue(message) {
     // TODO: Possibly return an object that has .dismiss() to dequeue the message.
-		const key = Date.now();
-		this.setState(reducers.enqueue(key, message));
-		return key;
-	}
+    const key = Date.now();
+    this.setState(reducers.enqueue(key, message));
+    return key;
+  }
 
-	dequeue(key) {
-		this.setState(reducers.dequeue(key));
-	}
+  dequeue(key) {
+    this.setState(reducers.dequeue(key));
+  }
 
   // TODO: Find a better way than a setState callback
   addAssociated(id, cb) {
@@ -75,75 +75,75 @@ class AppContainer extends React.Component {
   }
 
   // ===============
-	// LIFECYCLE HOOKS
+  // LIFECYCLE HOOKS
   // ===============
 
-	componentWillMount() {
-		if (this.state.isEditForm) {
-			this.getInfoFromURL();
-		}
-	}
+  componentWillMount() {
+    if (this.state.isEditForm) {
+      this.getInfoFromURL();
+    }
+  }
 
-	componentDidMount() {
-		if (this.state.isEditForm) {
-			this.getInfoFromAPI();
-		}
-	}
+  componentDidMount() {
+    if (this.state.isEditForm) {
+      this.getInfoFromAPI();
+    }
+  }
 
-	componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     const { records, groupedRecords } = this.state;
 
-		const recordsAreUpdated = !isEqual(prevState.records, records);
+    const recordsAreUpdated = !isEqual(prevState.records, records);
     if (recordsAreUpdated && config.groupByField) {
       const groupedRecords = groupRecords.call(this, records, config.groupByField);
       this.groupNamesAreMapped = false;
       this.setState({ groupedRecords });
     }
 
-		const groupedRecordsAreUpdated = !isEqual(prevState.groupedRecords, groupedRecords);
+    const groupedRecordsAreUpdated = !isEqual(prevState.groupedRecords, groupedRecords);
     if (groupedRecordsAreUpdated && !this.groupNamesAreMapped) {
       this.mapGroupName();
     }
 
-		const newFilterFunctionReceived = !isEqual(prevProps.filter, this.props.filter)
-		if (newFilterFunctionReceived) {
-			this.setState({
-				records: this.runProvidedFilter(this.state.records),
-				groupedRecords: this.runProvidedFilter(this.state.groupedRecords)
-		  });
-		}
+    const newFilterFunctionReceived = !isEqual(prevProps.filter, this.props.filter)
+    if (newFilterFunctionReceived) {
+      this.setState({
+        records: this.runProvidedFilter(this.state.records),
+        groupedRecords: this.runProvidedFilter(this.state.groupedRecords)
+      });
+    }
   }
 
-	getInfoFromURL() {
-		try {
-			const { xrm } = this.props;
-			const extraData = getExtraData.call(this, window.location.search);
+  getInfoFromURL() {
+    try {
+      const { xrm } = this.props;
+      const extraData = getExtraData.call(this, window.location.search);
       const hasRequiredConfig = !!(extraData || extraData.schemaName || extraData.displayField);
 
-			if (!hasRequiredConfig) {
-				throw new Error('Missing required configuration data.');
-			}
+      if (!hasRequiredConfig) {
+        throw new Error('Missing required configuration data.');
+      }
 
       config.apiUrl = xrm.Page.context.getClientUrl() + '/api/data/v8.2';
       config.schemaName = extraData.schemaName;
       config.displayField = extraData.displayField;
       config.groupByField = extraData.groupByField;
-			config.thisEntity.id = xrm.Page.data.entity.getId().replace(/{|}/g, '');
-			config.thisEntity.name = xrm.Page.data.entity.getEntityName();
-		} catch (error) {
-			console.error(error);
-			this.addError(error.message);
-		}
-	}
+      config.thisEntity.id = xrm.Page.data.entity.getId().replace(/{|}/g, '');
+      config.thisEntity.name = xrm.Page.data.entity.getEntityName();
+    } catch (error) {
+      console.error(error);
+      this.addError(error.message);
+    }
+  }
 
-	async getInfoFromAPI() {
-		if (!config || !config.hasRequiredProps()) {
-			this.addError('Configuration is missing required props.');
-			return;
-		}
+  async getInfoFromAPI() {
+    if (!config || !config.hasRequiredProps()) {
+      this.addError('Configuration is missing required props.');
+      return;
+    }
 
-		try {
-			const { relationshipType, thisEntity, relatedEntity } =
+    try {
+      const { relationshipType, thisEntity, relatedEntity } =
         await this.getRelationshipInfoAndThisEntityCollectionName();
 
       config.relationshipType = relationshipType;
@@ -152,28 +152,28 @@ class AppContainer extends React.Component {
       config.relatedEntity.name = relatedEntity.name;
       config.relatedEntity.intersectAttr = relatedEntity.intersectAttr;
 
-			const [ collectionName, primaryIdAttr ] =  await this.getRelatedEntityMetadata();
+      const [ collectionName, primaryIdAttr ] =  await this.getRelatedEntityMetadata();
 
       config.relatedEntity.collectionName = collectionName;
       config.relatedEntity.primaryIdAttr = primaryIdAttr;
 
-			const [ relatedEntityRecords, associatedRecords ] =
+      const [ relatedEntityRecords, associatedRecords ] =
         await this.getRelatedAndAssociatedRecords();
 
-			const filteredRelatedEntityRecords = this.runProvidedFilter(relatedEntityRecords);
+      const filteredRelatedEntityRecords = this.runProvidedFilter(relatedEntityRecords);
 
       this.setState({ records: filteredRelatedEntityRecords });
       associatedRecords && this.setState({
         associatedIds : associatedRecords.map(record => record[config.relatedEntity.primaryIdAttr])
       });
-		} catch (error) {
-			console.error(error);
-			this.addError(error.message);
-		}
-	}
+    } catch (error) {
+      console.error(error);
+      this.addError(error.message);
+    }
+  }
 
   // ====================================
-	// METHODS USED INSIDE LIFECYCLE HOOOKS
+  // METHODS USED INSIDE LIFECYCLE HOOOKS
   // ====================================
 
   getRelationshipInfoAndThisEntityCollectionName() {
@@ -235,16 +235,16 @@ class AppContainer extends React.Component {
         { intersectAttr: Entity1IntersectAttribute },
         { name: Entity2LogicalName, intersectAttr: Entity2IntersectAttribute }
       ];
-		} else if (thisEntityIsEntity2) {
+    } else if (thisEntityIsEntity2) {
       return [
         { intersectAttr: Entity2IntersectAttribute },
         { name: Entity1LogicalName, intersectAttr: Entity1IntersectAttribute }
       ];
-		} else {
-			throw new Error(
+    } else {
+      throw new Error(
         `Cannot determine whether ${thisEntity.name} is Entity1 or Entity2 in ${schemaName}`
       );
-		}
+    }
   }
 
   getRelatedEntityMetadata() {
@@ -308,11 +308,11 @@ class AppContainer extends React.Component {
     });
   }
 
-	runProvidedFilter(relatedEntityRecords) {
-		return this.props.filter
-			? relatedEntityRecords.filter(r => this.props.filter(r))
-			: relatedEntityRecords;
-	}
+  runProvidedFilter(relatedEntityRecords) {
+    return this.props.filter
+      ? relatedEntityRecords.filter(r => this.props.filter(r))
+      : relatedEntityRecords;
+  }
 
   async mapGroupName() {
     const { apiUrl, relatedEntity, groupByField } = config;
@@ -371,16 +371,16 @@ class AppContainer extends React.Component {
   // ===============================
 
   async associate(recordId) {
-		let statusMessageKey = this.enqueue('Associating...');
+    let statusMessageKey = this.enqueue('Associating...');
 
-		try {
-			await api.associateInPort(recordId, config);
-			this.addAssociated(recordId, () => {
-				this.dequeue(statusMessageKey);
-			});
-			refreshData.call(this);
-		} catch(error) {
-			console.error(error);
+    try {
+      await api.associateInPort(recordId, config);
+      this.addAssociated(recordId, () => {
+        this.dequeue(statusMessageKey);
+      });
+      refreshData.call(this);
+    } catch(error) {
+      console.error(error);
       this.dequeue(statusMessageKey);
       this.addError('Associate failed');
       notify.call(
@@ -389,47 +389,47 @@ class AppContainer extends React.Component {
           'If problem persists, please contact IT.',
         'ERROR'
       );
-		}
-	}
+    }
+  }
 
-	async disassociate(recordId) {
-		let statusMessageKey = this.enqueue('Disassociating...');
+  async disassociate(recordId) {
+    let statusMessageKey = this.enqueue('Disassociating...');
 
-		try {
-			await api.disassociateInPort(recordId, config);
-			this.removeAssociated(recordId, () => {
-				this.dequeue(statusMessageKey);
-			});
-			refreshData.call(this);
-		} catch(error) {
-			console.error(error);
+    try {
+      await api.disassociateInPort(recordId, config);
+      this.removeAssociated(recordId, () => {
+        this.dequeue(statusMessageKey);
+      });
+      refreshData.call(this);
+    } catch(error) {
+      console.error(error);
       this.dequeue(statusMessageKey);
-			this.addError('Disassociate failed');
+      this.addError('Disassociate failed');
       notify.call(
         this,
         'There\'s a problem in disassociating that record. Try to refresh the page and do it ' +
           'again. If problem persists, please contact IT.',
         'ERROR'
       );
-		}
-	}
+    }
+  }
 
-	async batchAssociate(recordIds) {
-		const statusMessageKey = this.enqueue('Associating...');
-		const associateRequests = recordIds && recordIds.map(recordId => (
+  async batchAssociate(recordIds) {
+    const statusMessageKey = this.enqueue('Associating...');
+    const associateRequests = recordIds && recordIds.map(recordId => (
       // assciateInPort() returns the responseText if status code is in the 200's, in this case, it
       // would be "".
       api.associateInPort(recordId, config)
         .then(() => {
           // We're modifying the associatedIds here one by one, instead of "batching" them, so that
           // we get immediate visual feedback for the ones that are done.
-  				this.addAssociated(recordId);
-  			})
+          this.addAssociated(recordId);
+        })
     ));
 
-		try {
-			await Promise.all(associateRequests);
-			this.dequeue(statusMessageKey);
+    try {
+      await Promise.all(associateRequests);
+      this.dequeue(statusMessageKey);
       // Because the server is multi-threaded, our batched requests are ran in such a way that the
       // last one could finish before the second to last one. For example, if we select all NT
       // books, we would expect the books (text) field to be "mat-rev". However, the action that's
@@ -437,47 +437,47 @@ class AppContainer extends React.Component {
       // in "mat-3jn, rev". This runAction request caps off the batched requests so that the same
       // action is triggered again once they are finished (hopefully?). A possible improvement would
       // be to actually batch the requests to a single, atomic request.
-			await api.runAction("wa_SetBooksTextForProject", config);
-			refreshData.call(this);
-		} catch (error) {
-			console.error(error);
+      await api.runAction("wa_SetBooksTextForProject", config);
+      refreshData.call(this);
+    } catch (error) {
+      console.error(error);
       this.dequeue(statusMessageKey);
-			this.addError('Associate failed');
+      this.addError('Associate failed');
       notify.call(
         this,
         'There\'s a problem in associating one of the records. Try to refresh the page and do it ' +
           'again. If problem persists, please contact IT.',
         'ERROR'
       );
-		}
-	}
+    }
+  }
 
   // NOTE: See comments for batchAssociate()
-	async batchDisassociate(recordIds) {
-		const statusMessageKey = this.enqueue('Disassociating...');
-		const disassociateRequests = recordIds && recordIds.map(recordId => (
+  async batchDisassociate(recordIds) {
+    const statusMessageKey = this.enqueue('Disassociating...');
+    const disassociateRequests = recordIds && recordIds.map(recordId => (
       api.disassociateInPort(recordId, config).then(resp => {
-				this.removeAssociated(recordId);
-			})
+        this.removeAssociated(recordId);
+      })
     ));
 
-		try {
-			await Promise.all(disassociateRequests);
-			this.dequeue(statusMessageKey);
-			await api.runAction("wa_SetBooksTextForProject", config);
-			refreshData.call(this);
-		} catch (error) {
-			console.error(error);
+    try {
+      await Promise.all(disassociateRequests);
       this.dequeue(statusMessageKey);
-			this.addError('Disassociate failed');
+      await api.runAction("wa_SetBooksTextForProject", config);
+      refreshData.call(this);
+    } catch (error) {
+      console.error(error);
+      this.dequeue(statusMessageKey);
+      this.addError('Disassociate failed');
       notify.call(
         this,
         'There\'s a problem in associating one of the records. Try to refresh the page and do it ' +
           'again. If problem persists, please contact IT.',
         'ERROR'
       );
-		}
-	}
+    }
+  }
 
   // ======
   // RENDER
@@ -485,8 +485,8 @@ class AppContainer extends React.Component {
 
   render() {
     return this.state.isEditForm
-			? <App
-				isEnabled={this.props.isEnabled}
+      ? <App
+        isEnabled={this.props.isEnabled}
         config={config}
         {...this.state}
         filters={this.filters}
@@ -495,9 +495,9 @@ class AppContainer extends React.Component {
         disassociate={this.disassociate}
         batchAssociate={this.batchAssociate}
         batchDisassociate={this.batchDisassociate}
-				filter={this.filter}
+        filter={this.filter}
       />
-			: <EmptyMessage>To enable this content, create the record.</EmptyMessage>;
+      : <EmptyMessage>To enable this content, create the record.</EmptyMessage>;
   }
 }
 
