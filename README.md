@@ -46,7 +46,7 @@ The configuration looks like this:
 {
   "schemaName": "wa_wa_project_wa_book",
   "displayField": "wa_name",
-  "groupByField": "wa_testament".
+  "groupByField": "wa_testament"
 }
 ```
 
