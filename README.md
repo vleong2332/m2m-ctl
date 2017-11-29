@@ -25,6 +25,45 @@ Your Fiddler's AutoResponder should look something like this:
 
 ![Image of AutoResponder's setting](./img/fiddler_autoresponder_setting.JPG)
 
+## Deployment
+
+1. Build the project - `npm run build`
+2. Upload the generated HTML, CSS, and JS in build folder to CRM (via UI or Web Resource Manager).
+
+### Using the Web Resource
+
+1. In a record/entity form, insert a web resource.
+2. Choose the uploaded `index.html` as the web resource.
+3. Uncheck "Restrict cross-frame scripting, where supported."
+4. Check "Pass record object-type and unique indentifier as paramenters.
+5. For Custom Paramenter(data), insert the JSON configuration.
+
+### Configuration
+
+The configuration looks like this:
+
+``` json
+{
+  "schemaName": "wa_wa_project_wa_book",
+  "displayField": "wa_name",
+  "groupByField": "wa_testament".
+}
+```
+
+- `schemaName` - The name of the M2M relationshi. _required_
+- `displayField` - The field/column name of the related entity to be used as a label. _required_
+- `groupByField` - The field/column name of the related entity to be used to group records.
+
+You can either hand-type the config object (it's not that hard), or use the configuration generator.
+
+### Configuration Generator
+
+- Open `public/config.html` in a browser.
+- Fill out the form.
+- Click "Generate".
+- Copy the generated code.
+- Paste the config into the Custom Parameter(data) in the Web Resource Properties popup window.
+
 ## Fiddler Tips
 
 * *For Mac* - There's a Fiddler for mac, but people seem to recommend running it in a virtual machine (VirtualBox or Parallels) for stability. [Here](http://docs.telerik.com/fiddler/configure-fiddler/tasks/configureformac)'s a way to configure it if you want to use the host browser and make Fiddler catches the traffic in VM. Personally, I just use the browser in VM itself.
@@ -40,7 +79,7 @@ Read it [here](https://github.com/facebookincubator/create-react-app/blob/master
 
 Besides making sure that unit tests are written for your changes, run the test (`npm test`) to make sure that your changes don't break anything.
 
-## Troubleshoot
+## Troubleshooting
 
 *Q: After deploying the built files with XrmToolBox Web Resource Manager, I got "HTTP 500 - Internal Server Error" when the form tries to load the web resource.*
 A: The cause is unknown at this point, but try to upload the files (html, css, and js) using the built-in web resource upload UI provided by Dynamics CRM.
